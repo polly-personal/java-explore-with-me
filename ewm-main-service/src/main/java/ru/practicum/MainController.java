@@ -19,6 +19,7 @@ public class MainController {
 
     @GetMapping("/{id}")
     public EndpointHitDto get(@PathVariable @Min(1) long id) {
+
         log.info("🟫 GET /events/{}", id);
 
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
