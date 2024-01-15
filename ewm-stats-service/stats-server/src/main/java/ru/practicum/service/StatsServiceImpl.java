@@ -19,11 +19,8 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
 
     public EndpointHitDto create(EndpointHitDto endpointHitDto) {
-        EndpointHit endpointHit = StatsMapper.toEndpointHit(endpointHitDto);
-        EndpointHit entity = statsRepository.save(endpointHit);
-
-        EndpointHitDto result = StatsMapper.toEndpointHitDto(entity);
-        return result;
+        EndpointHit entity = statsRepository.save(StatsMapper.toEndpointHit(endpointHitDto));
+        return StatsMapper.toEndpointHitDto(entity);
     }
 
     public List<ViewStatsDto> getByRequestParam(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
