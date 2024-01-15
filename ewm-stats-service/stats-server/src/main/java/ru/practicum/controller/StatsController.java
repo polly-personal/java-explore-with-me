@@ -26,17 +26,17 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/hit")
-    public ResponseEntity<String> create(@RequestBody EndpointHitDto endpointHitDto) {
+    public ResponseEntity<EndpointHitDto> create(@Validated @RequestBody EndpointHitDto endpointHitDto) {
         log.info("🟫 POST /hit");
 
-        statsService.create(endpointHitDto);
+        EndpointHitDto result = statsService.create(endpointHitDto);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Access-Control-Allow-Origin", "*");
 
         return ResponseEntity.status(201)
                 .headers(responseHeaders)
-                .body("Информация сохранена");
+                .body(result);
     }
 
     @GetMapping("/stats")

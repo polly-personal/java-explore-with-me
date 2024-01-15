@@ -1,9 +1,10 @@
 package ru.practicum;
 
-
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Builder
 @Data
 public class EndpointHitDto {

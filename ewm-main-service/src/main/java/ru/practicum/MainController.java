@@ -27,6 +27,7 @@ public class MainController {
                 .uri("/events/2")
                 .ip("192.163.0.1")
                 .timestamp("2022-09-06 11:00:23")
+                /*.timestamp(LocalDateTime.of(2022, 9, 6, 11, 0, 23))*/
                 .build();
         ResponseEntity<Object> response = statsClient.create(endpointHitDto);
         System.out.println(response);
