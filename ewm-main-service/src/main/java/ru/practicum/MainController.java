@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import java.time.LocalDateTime;
 
 /* черновик */
 @Slf4j
@@ -26,8 +27,7 @@ public class MainController {
                 .app("ewm-main-service")
                 .uri("/events/2")
                 .ip("192.163.0.1")
-                .timestamp("2022-09-06 11:00:23")
-                /*.timestamp(LocalDateTime.of(2022, 9, 6, 11, 0, 23))*/
+                .timestamp(LocalDateTime.of(2022, 9, 6, 11, 0, 23))
                 .build();
         ResponseEntity<Object> response = statsClient.create(endpointHitDto);
         System.out.println(response);
