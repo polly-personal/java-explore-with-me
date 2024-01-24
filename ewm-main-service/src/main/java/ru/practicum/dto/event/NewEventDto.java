@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
-import org.springframework.validation.annotation.Validated;
 import ru.practicum.dto.PostValidation;
 import ru.practicum.dto.location.LocationDto;
 
