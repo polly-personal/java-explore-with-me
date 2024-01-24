@@ -77,7 +77,12 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateForAdminByEventId(long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
         Event event = checkAndGetEntityById(eventId);
 
-        checkCurrentState(event.getState(), "PUBLISHED", "CANCELED");
+        EventState currentEventState = event.getState();
+        if (currentEventState.equals(EventState.PUBLISHED) || currentEventState.equals(EventState.CANCELED)) {
+            throw new MainExceptionImpossibleToCreateOrUpdateEntity("Cannot publish the event because it's not in the right " +
+                    "state: " + currentEventState);
+        }
+
         if (updateEventAdminRequest.getStateAction() != null) {
             if (updateEventAdminRequest.getStateAction().equals("PUBLISH_EVENT")) {
                 event.setState(EventState.PUBLISHED);
@@ -131,7 +136,10 @@ public class EventServiceImpl implements EventService {
 
         Event event = checkInitiatorIdIsLinkedToEventId(initiatorId, eventId);
 
-        checkCurrentState(event.getState(), "PUBLISHED", null);
+        EventState currentEventState = event.getState();
+        if (currentEventState.equals(EventState.PUBLISHED)) {
+            throw new MainExceptionImpossibleToCreateOrUpdateEntity("Only pending or canceled events can be changed");
+        }
         if (updateEventUserRequest.getStateAction() != null) {
             if (event.getState().equals(EventState.PENDING) && updateEventUserRequest.getStateAction().equals("CANCEL_REVIEW")) {
                 event.setState(EventState.CANCELED);
@@ -310,19 +318,6 @@ public class EventServiceImpl implements EventService {
             throw new MainExceptionIncompatibleIds("id инициатора: " + initiatorId + " НЕ связан с id события: " + eventId);
         } else {
             return event;
-        }
-    }
-
-    private void checkCurrentState(EventState currentEventState, String constraintOne, String constraintTwo) {
-        /* constraintOne -- PUBLISHED */
-        if (currentEventState.equals(EventState.valueOf(constraintOne)) && constraintTwo == null) {
-            throw new MainExceptionImpossibleToCreateOrUpdateEntity("Only pending or canceled events can be changed");
-        }
-
-        /* constraintOne -- PUBLISHED и constraintTwo -- CANCELED*/
-        if (currentEventState.equals(EventState.valueOf(constraintOne)) || currentEventState.equals(constraintTwo)) {
-            throw new MainExceptionImpossibleToCreateOrUpdateEntity("Cannot publish the event because it's not in the right " +
-                    "state: " + currentEventState.toString());
         }
     }
 
