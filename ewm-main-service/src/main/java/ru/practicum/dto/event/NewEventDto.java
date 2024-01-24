@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 
-@Validated
+/*@Validated*/
 @Jacksonized
 @Builder
 @Data

@@ -15,6 +15,7 @@ import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.service.event.EventService;
 import ru.practicum.service.requests.RequestsService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -28,7 +29,7 @@ public class UsersPrivateEventsController {
 
     @PostMapping
     public EventFullDto postForInitiator(@PathVariable long userId,
-                                         @RequestBody @Validated(PostValidation.class) NewEventDto newEventDto) {
+                                         @RequestBody /*@Validated(PostValidation.class)*/ @Valid NewEventDto newEventDto) {
         log.info("🟫🟫 POST /users/{}/events", userId);
         return eventService.createForInitiator(userId, newEventDto);
     }
