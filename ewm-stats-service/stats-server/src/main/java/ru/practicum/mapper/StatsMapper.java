@@ -3,7 +3,7 @@ package ru.practicum.mapper;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.EndpointHitDto;
-import ru.practicum.model.EndpointHit;
+import ru.practicum.entity.EndpointHit;
 
 @Slf4j
 @UtilityClass

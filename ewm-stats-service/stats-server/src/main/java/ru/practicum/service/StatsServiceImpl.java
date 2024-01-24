@@ -1,11 +1,13 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.mapper.StatsMapper;
-import ru.practicum.model.EndpointHit;
+import ru.practicum.entity.EndpointHit;
 import ru.practicum.repository.StatsRepository;
 import ru.practicum.repository.ViewStatsProjection;
 
@@ -13,14 +15,19 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
 
+    @Transactional
     public EndpointHitDto create(EndpointHitDto endpointHitDto) {
-        EndpointHit entity = statsRepository.save(StatsMapper.toEndpointHit(endpointHitDto));
-        return StatsMapper.toEndpointHitDto(entity);
+        EndpointHit endpointHit = statsRepository.save(StatsMapper.toEndpointHit(endpointHitDto));
+
+        log.info("🟩 создано попадание на сайт: " + endpointHit);
+        return StatsMapper.toEndpointHitDto(endpointHit);
     }
 
     public List<ViewStatsDto> getByRequestParam(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
@@ -47,6 +54,7 @@ public class StatsServiceImpl implements StatsService {
                 })
                 .collect(Collectors.toList());
 
+        log.info("🟦 выдан список попаданий на сайты: " + viewStatsDtos);
         return viewStatsDtos;
     }
 }
