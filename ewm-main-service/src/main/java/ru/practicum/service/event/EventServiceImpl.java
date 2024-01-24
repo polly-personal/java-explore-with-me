@@ -107,7 +107,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventAdminRequest.getDescription() != null && !event.getDescription().equals(updateEventAdminRequest.getDescription())) {
             event.setDescription(updateEventAdminRequest.getDescription());
         }
-        if (updateEventAdminRequest.getLocation() != null && !event.getLocation().equals(updateEventAdminRequest.getLocation())) {
+        if (updateEventAdminRequest.getLocation() != null && !event.getLocation().equals(LocationMapper.toLocation(updateEventAdminRequest.getLocation()))) {
             event.setLocation(locationService.getByLatAndLonOrCreateEntity(LocationMapper.toLocation(updateEventAdminRequest.getLocation())));
         }
         if (updateEventAdminRequest.getPaid() != null && !event.getPaid().equals(updateEventAdminRequest.getPaid())) {
@@ -163,7 +163,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventUserRequest.getDescription() != null && !event.getDescription().equals(updateEventUserRequest.getDescription())) {
             event.setDescription(updateEventUserRequest.getDescription());
         }
-        if (updateEventUserRequest.getLocation() != null && !event.getLocation().equals(updateEventUserRequest.getLocation())) {
+        if (updateEventUserRequest.getLocation() != null && !event.getLocation().equals(LocationMapper.toLocation(updateEventUserRequest.getLocation()))) {
             event.setLocation(locationService.getByLatAndLonOrCreateEntity(LocationMapper.toLocation(updateEventUserRequest.getLocation())));
         }
         if (updateEventUserRequest.getPaid() != null && !event.getPaid().equals(updateEventUserRequest.getPaid())) {
