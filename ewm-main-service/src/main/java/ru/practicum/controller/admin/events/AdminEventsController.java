@@ -10,6 +10,7 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.UpdateEventAdminRequest;
 import ru.practicum.service.event.EventService;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,19 +26,20 @@ public class AdminEventsController {
 
     @PatchMapping("{eventId}")
     public EventFullDto patchForAdminByEventId(@PathVariable long eventId,
-                                               @RequestBody @Validated(PostValidation.class) UpdateEventAdminRequest updateEventAdminRequest) {
+                                               @RequestBody /*@Validated(PostValidation.class)
+                                                */ @Valid UpdateEventAdminRequest updateEventAdminRequest) {
         log.info("🟫🟫 PATCH /admin/events/{}", eventId);
         return eventService.updateForAdminByEventId(eventId, updateEventAdminRequest);
     }
 
     @GetMapping
     public List<EventFullDto> getAllForAdmin(@RequestParam(name = "users", required = false) List<Long> usersIds,
-                                                         @RequestParam(required = false) List<String> states,
-                                                         @RequestParam(name = "categories", required = false) List<Long> categoryIds,
-                                                         @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime rangeStart,
-                                                         @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime rangeEnd,
-                                                         @RequestParam(required = false, defaultValue = "0") int from,
-                                                         @RequestParam(required = false, defaultValue = "10") int size) {
+                                             @RequestParam(required = false) List<String> states,
+                                             @RequestParam(name = "categories", required = false) List<Long> categoryIds,
+                                             @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime rangeStart,
+                                             @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime rangeEnd,
+                                             @RequestParam(required = false, defaultValue = "0") int from,
+                                             @RequestParam(required = false, defaultValue = "10") int size) {
         log.info("🟫🟫 GET /admin/events?users={}&states={}&categories={}&rangeStart={}&rangeEnd={}",
                 usersIds, states, categoryIds, rangeStart, rangeEnd);
         return eventService.getAllForAdmin(usersIds, states, categoryIds, rangeStart, rangeEnd, from, size);

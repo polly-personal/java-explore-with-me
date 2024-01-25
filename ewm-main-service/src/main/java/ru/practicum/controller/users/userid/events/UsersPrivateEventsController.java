@@ -37,7 +37,8 @@ public class UsersPrivateEventsController {
     @PatchMapping("{eventId}")
     public EventFullDto patchEventForInitiatorByInitiatorIdAndEventId(@PathVariable(name = "userId") long initiatorId,
                                                                       @PathVariable long eventId,
-                                                                      @RequestBody @Validated(PostValidation.class) UpdateEventUserRequest updateEventUserRequest) {
+                                                                      @RequestBody /*@Validated(PostValidation.class)
+                                                                       */ @Valid UpdateEventUserRequest updateEventUserRequest) {
         log.info("🟫🟫 GET /users/{}/events/{}", initiatorId, eventId);
         return eventService.updateEventForInitiatorByInitiatorIdAndEventId(initiatorId, eventId, updateEventUserRequest);
     }
@@ -45,7 +46,8 @@ public class UsersPrivateEventsController {
     @PatchMapping("{eventId}/requests")
     public EventRequestStatusUpdateResult patchEventRequestsForInitiatorByInitiatorIdAndEventId(@PathVariable(name = "userId") long initiatorId,
                                                                                                 @PathVariable long eventId,
-                                                                                                @RequestBody @Validated(PostValidation.class) EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+                                                                                                @RequestBody
+                                                                                                /*@Validated(PostValidation.class)*/ @Valid EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         log.info("🟫🟫 GET /users/{}/events/{}/requests", initiatorId, eventId);
         return requestsService.updateEventRequestsForInitiatorByInitiatorIdAndEventId(initiatorId, eventId,
                 eventRequestStatusUpdateRequest);

@@ -29,5 +29,4 @@ public class CategoriesPublicController {
         log.info("🟫🟫 GET /categories?{from}=from&{size}=size", from, size);
         return categoryService.getAll(from, size);
     }
-
 }
