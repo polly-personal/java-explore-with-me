@@ -8,7 +8,6 @@ import ru.practicum.dto.user.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.service.user.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -20,7 +19,7 @@ public class AdminUsersController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto create(@RequestBody /*@Validated(PostValidation.class)*/ @Valid NewUserRequest newUserRequest) {
+    public UserDto create(@RequestBody @Validated NewUserRequest newUserRequest) {
         log.info("🟫🟫 POST /admin/users");
         return userService.create(newUserRequest);
     }

@@ -9,7 +9,6 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.UpdateEventAdminRequest;
 import ru.practicum.service.event.EventService;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,8 +24,7 @@ public class AdminEventsController {
 
     @PatchMapping("{eventId}")
     public EventFullDto patchForAdminByEventId(@PathVariable long eventId,
-                                               @RequestBody /*@Validated(PostValidation.class)
-                                                */ @Valid UpdateEventAdminRequest updateEventAdminRequest) {
+                                               @RequestBody @Validated UpdateEventAdminRequest updateEventAdminRequest) {
         log.info("🟫🟫 PATCH /admin/events/{}", eventId);
         return eventService.updateForAdminByEventId(eventId, updateEventAdminRequest);
     }

@@ -9,8 +9,6 @@ import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.dto.compilation.UpdateCompilationRequest;
 import ru.practicum.service.compilation.CompilationService;
 
-import javax.validation.Valid;
-
 @Slf4j
 @Validated
 @RequiredArgsConstructor
@@ -20,15 +18,14 @@ public class AdminCompilationsController {
     private final CompilationService compilationService;
 
     @PostMapping
-    public CompilationDto post(@RequestBody /*@Validated(PostValidation.class)*/ @Valid NewCompilationDto newCompilationDto) {
+    public CompilationDto post(@RequestBody @Validated NewCompilationDto newCompilationDto) {
         log.info("🟫🟫 POST /admin/compilations");
         return compilationService.create(newCompilationDto);
     }
 
     @PatchMapping("/{compId}")
     public CompilationDto patch(@PathVariable(name = "compId") long id,
-                                @RequestBody /*@Validated(PatchValidation.class)
-                                 */ @Valid UpdateCompilationRequest updateCompilationRequest) {
+                                @RequestBody @Validated UpdateCompilationRequest updateCompilationRequest) {
         log.info("🟫🟫 PATCH /admin/compilations/{compId}", id);
         return compilationService.updateForAdmin(id, updateCompilationRequest);
     }

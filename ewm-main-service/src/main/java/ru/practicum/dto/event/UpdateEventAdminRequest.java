@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
-import ru.practicum.dto.PatchValidation;
 import ru.practicum.dto.location.LocationDto;
 
 import javax.validation.constraints.PositiveOrZero;
@@ -32,7 +31,7 @@ public class UpdateEventAdminRequest {
 
     private Boolean paid;
 
-    @PositiveOrZero(message = "поле \"participantLimit\" должно быть положительным или равным нулю", groups = PatchValidation.class)
+    @PositiveOrZero(message = "поле \"participantLimit\" должно быть положительным или равным нулю")
     private Integer participantLimit;
 
     private Boolean requestModeration;

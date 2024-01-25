@@ -2,7 +2,6 @@ package ru.practicum.dto.compilation;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.dto.PatchValidation;
 
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -14,6 +13,6 @@ public class UpdateCompilationRequest {
 
     private Boolean pinned;
 
-    @Size(min = 1, max = 50, groups = PatchValidation.class)
+    @Size(min = 1, max = 50)
     private String title;
 }
