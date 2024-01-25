@@ -68,6 +68,6 @@ public class EventsPublicController {
                 .build();
         statsClient.create(endpointHitDto);
 
-        return eventService.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
+        return eventService.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 }

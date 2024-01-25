@@ -23,7 +23,6 @@ import ru.practicum.service.categories.CategoryService;
 import ru.practicum.service.location.LocationService;
 import ru.practicum.service.user.UserService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -260,8 +259,7 @@ public class EventServiceImpl implements EventService {
 
     public List<EventShortDto> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid,
                                                     LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                    Boolean onlyAvailable, String sort, int from, int size,
-                                                    HttpServletRequest request) {
+                                                    Boolean onlyAvailable, String sort, int from, int size) {
         if (categoryIds == null) categoryIds = new ArrayList<>();
         if (rangeStart == null) rangeStart = LocalDateTime.now();
         if (rangeEnd == null) rangeEnd = LocalDateTime.now().plusYears(5);
@@ -272,7 +270,8 @@ public class EventServiceImpl implements EventService {
         } else {
             repoSort = Sort.by(Sort.Direction.DESC, "eventDate");
         }
-        PageRequest pageRequest = PageRequest.of(from, size, repoSort);
+        /*PageRequest pageRequest = PageRequest.of(from, size, repoSort);*/
+        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, repoSort);
         Page<Event> eventPages = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, pageRequest);
 
         List<ConfirmedRequestShortDto> requestRepoResult = requestsRepository.getCountConfirmedRequestsForAllEvents();

@@ -3,7 +3,6 @@ package ru.practicum.service.event;
 import ru.practicum.dto.event.*;
 import ru.practicum.entity.event.Event;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public interface EventService {
 
     List<EventShortDto> getAllForInitiatorByInitiatorId(int from, int size, long userId);
 
-    List<EventShortDto> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request);
+    List<EventShortDto> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size);
 
     Event checkInitiatorIdIsLinkedToEventId(long initiatorId, long eventId);
 }
