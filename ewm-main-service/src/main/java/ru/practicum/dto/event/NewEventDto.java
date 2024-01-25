@@ -16,7 +16,7 @@ import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 @Data
 public class NewEventDto {
     @Size(min = 20, max = 2000)
-    @NotEmpty(message = "поле \"annotation\" должно быть заполнено")
+    @NotBlank(message = "поле \"annotation\" должно быть заполнено")
     private String annotation;
 
     @Positive(message = "поле \"category\" должно быть положительным")
@@ -24,7 +24,7 @@ public class NewEventDto {
     private Long category;
 
     @Size(min = 20, max = 7000)
-    @NotEmpty(message = "поле \"description\" должно быть заполнено"/**/)
+    @NotBlank(message = "поле \"description\" должно быть заполнено"/**/)
     private String description;
 
     @Future(message = "поле \"eventDate\" должно быть в будущем")
@@ -43,6 +43,6 @@ public class NewEventDto {
     private Boolean requestModeration;
 
     @Size(min = 3, max = 120)
-    @NotNull(message = "поле \"title\" должно быть заполнено")
+    @NotBlank(message = "поле \"title\" должно быть заполнено")
     private String title;
 }

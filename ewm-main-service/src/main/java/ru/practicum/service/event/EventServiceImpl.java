@@ -270,8 +270,8 @@ public class EventServiceImpl implements EventService {
         } else {
             repoSort = Sort.by(Sort.Direction.DESC, "eventDate");
         }
-        /*PageRequest pageRequest = PageRequest.of(from, size, repoSort);*/
-        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, repoSort);
+        PageRequest pageRequest = PageRequest.of(from, size, repoSort);
+        /*PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, repoSort);*/
         Page<Event> eventPages = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, pageRequest);
 
         List<ConfirmedRequestShortDto> requestRepoResult = requestsRepository.getCountConfirmedRequestsForAllEvents();

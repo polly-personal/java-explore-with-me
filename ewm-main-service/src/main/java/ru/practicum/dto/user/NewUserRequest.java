@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Jacksonized
@@ -15,6 +16,6 @@ public class NewUserRequest {
     @NotEmpty(message = "поле \"email\" должно быть заполнено")
     private String email;
 
-    @NotEmpty(message = "поле \"name\" должно быть заполнено")
+    @NotBlank(message = "поле \"name\" должно быть заполнено")
     private String name;
 }

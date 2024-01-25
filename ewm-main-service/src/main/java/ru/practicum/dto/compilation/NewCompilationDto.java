@@ -3,6 +3,7 @@ package ru.practicum.dto.compilation;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,6 +19,6 @@ public class NewCompilationDto { // In
     private Boolean pinned;
 
     @Size(min = 1, max = 50)
-    @NotEmpty(message = "поле \"title\" должно быть заполнено")
+    @NotBlank(message = "поле \"title\" должно быть заполнено")
     private String title;
 }
