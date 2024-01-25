@@ -260,7 +260,8 @@ public class EventServiceImpl implements EventService {
         if (rangeStart == null) rangeStart = LocalDateTime.now();
         if (rangeEnd == null) rangeEnd = LocalDateTime.now().plusYears(5);
 
-        List<Event> events = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd);
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        List<Event> events = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, pageRequest);
 
         List<ConfirmedRequestShortDto> requestRepoResult = requestsRepository.getCountConfirmedRequestsForAllEvents();
         Map<Long, Integer> countPublishedRequestsForAllEvents = new HashMap<>();
@@ -299,10 +300,8 @@ public class EventServiceImpl implements EventService {
             eventShortDtos.sort(Comparator.comparing(EventShortDto::getEventDate));
         }
 
-        int to = Math.min(from + size, eventShortDtos.size());
-
-        log.info("🟦 для публичного пользователя выдан список событий: " + eventShortDtos.subList(from, to));
-        return eventShortDtos.subList(from, to);
+        log.info("🟦 для публичного пользователя выдан список событий: " + eventShortDtos);
+        return eventShortDtos;
     }
 
     public Event checkInitiatorIdIsLinkedToEventId(long initiatorId, long eventId) {
