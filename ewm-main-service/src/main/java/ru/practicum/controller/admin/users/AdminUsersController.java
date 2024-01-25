@@ -26,6 +26,7 @@ public class AdminUsersController {
         return userService.create(newUserRequest);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
     public void delete(@PathVariable(name = "userId") long id) {
         log.info("🟫🟫 DELETE /admin/users/{}", id);

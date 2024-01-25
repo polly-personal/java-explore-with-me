@@ -32,6 +32,7 @@ public class AdminCompilationsController {
         return compilationService.updateForAdmin(id, updateCompilationRequest);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{compId}")
     public void deleteForAdminById(@PathVariable(name = "compId") long id) {
         log.info("🟫🟫 DELETE /admin/compilations/{compId}", id);

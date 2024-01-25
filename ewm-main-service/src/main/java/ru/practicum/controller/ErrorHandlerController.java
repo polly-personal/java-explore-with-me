@@ -49,21 +49,6 @@ public class ErrorHandlerController {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handelMainExceptionInitiatorIdNotLinkedToEventId(MainExceptionIncompatibleIds e) {
-        ApiError apiError = ApiError.builder()
-                .errors(List.of(e.getStackTrace()).subList(0, 1))
-                .status("400 BAD_REQUEST")
-                .reason("Incorrectly made request")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        log.warn("🟥📱 запрос составлен некорректно (некорректное значение переменной пути): " + apiError.toString());
-        return apiError;
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handelMainExceptionIncorrectDateTime(MainExceptionIncorrectDateTime e) {
         ApiError apiError = ApiError.builder()
                 .errors(List.of(e.getStackTrace()).subList(0, 1))
@@ -104,6 +89,21 @@ public class ErrorHandlerController {
                 .build();
 
         log.warn("🟥📱 объект/сущность/dto не найден или не доступен: " + apiError.toString());
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handelMainExceptionInitiatorIdNotLinkedToEventId(MainExceptionIncompatibleIds e) {
+        ApiError apiError = ApiError.builder()
+                .errors(List.of(e.getStackTrace()).subList(0, 1))
+                .status("400 BAD_REQUEST")
+                .reason("Incorrectly made request")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        log.warn("🟥📱 запрос составлен некорректно (некорректное значение переменной пути): " + apiError.toString());
         return apiError;
     }
 
