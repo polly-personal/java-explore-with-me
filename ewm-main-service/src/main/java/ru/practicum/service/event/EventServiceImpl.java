@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatsClient;
@@ -24,10 +23,7 @@ import ru.practicum.service.location.LocationService;
 import ru.practicum.service.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -264,25 +260,13 @@ public class EventServiceImpl implements EventService {
         if (rangeStart == null) rangeStart = LocalDateTime.now();
         if (rangeEnd == null) rangeEnd = LocalDateTime.now().plusYears(5);
 
-        Sort repoSort;
-        if (sort.equals("VIEWS")) {
-            repoSort = Sort.by(Sort.Direction.DESC, "views");
-        } else {
-            repoSort = Sort.by(Sort.Direction.DESC, "event_date");
-        }
-        PageRequest pageRequest = PageRequest.of(from, size, repoSort);
-        /*PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, repoSort);*/
-        /*Page<Event> eventPages = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart,
-        rangeEnd, pageRequest);*/
-        List<Event> eventPages = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, pageRequest);
+        List<Event> events = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd);
 
         List<ConfirmedRequestShortDto> requestRepoResult = requestsRepository.getCountConfirmedRequestsForAllEvents();
         Map<Long, Integer> countPublishedRequestsForAllEvents = new HashMap<>();
         for (ConfirmedRequestShortDto counts : requestRepoResult) {
             countPublishedRequestsForAllEvents.put(counts.getEventId(), counts.getCount());
         }
-
-        List<Event> events = eventPages/*.toList()*/;
 
         if (onlyAvailable) {
             events = events.stream()
@@ -309,8 +293,16 @@ public class EventServiceImpl implements EventService {
             }
         });
 
-        log.info("🟦 для публичного пользователя выдан список событий: " + eventShortDtos);
-        return eventShortDtos;
+        if (sort.equals("VIEWS")) {
+            eventShortDtos.sort(Comparator.comparing(EventShortDto::getViews).reversed());
+        } else {
+            eventShortDtos.sort(Comparator.comparing(EventShortDto::getEventDate));
+        }
+
+        int to = Math.min(from + size, eventShortDtos.size());
+
+        log.info("🟦 для публичного пользователя выдан список событий: " + eventShortDtos.subList(from, to));
+        return eventShortDtos.subList(from, to);
     }
 
     public Event checkInitiatorIdIsLinkedToEventId(long initiatorId, long eventId) {
