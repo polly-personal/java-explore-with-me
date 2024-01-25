@@ -51,11 +51,12 @@ public class EventServiceImpl implements EventService {
             throw new MainExceptionIncorrectDateTime("Field: eventDate. Error: дата и время на которые намечено " +
                     "событие не может быть раньше, чем через два часа от текущего момента. Value: " + newEventDto.getEventDate());
         }
-        if (newEventDto.getRequestModeration() == null) {
-            newEventDto.setRequestModeration(true);
-        }
+        if (newEventDto.getRequestModeration() == null) newEventDto.setRequestModeration(true);
+        if (newEventDto.getPaid() == null) newEventDto.setPaid(false);
+        if (newEventDto.getParticipantLimit() == null) newEventDto.setParticipantLimit(0);
 
         Event event = EventMapper.toEvent(newEventDto);
+
         event.setCategory(categoryService.checkAndGetEntityById(newEventDto.getCategory()));
         event.setLocation(locationService.getByLatAndLonOrCreateEntity(event.getLocation()));
         event.setCreatedOn(LocalDateTime.now());

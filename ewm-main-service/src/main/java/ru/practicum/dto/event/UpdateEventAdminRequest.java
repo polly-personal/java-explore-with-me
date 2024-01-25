@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 import ru.practicum.dto.location.LocationDto;
 
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -16,8 +17,10 @@ import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 @Builder
 @Data
 public class UpdateEventAdminRequest {
+    @Size(min = 20, max = 2000)
     private String annotation;
 
+    @Positive(message = "поле \"category\" должно быть положительным")
     private Long category;
 
     @Size(min = 20, max = 7000)

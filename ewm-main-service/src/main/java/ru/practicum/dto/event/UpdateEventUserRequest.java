@@ -15,8 +15,10 @@ import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 @Builder
 @Data
 public class UpdateEventUserRequest {
+    @Size(min = 20, max = 2000)
     private String annotation;
 
+    @Positive(message = "поле \"category\" должно быть положительным")
     private Long category;
 
     @Size(min = 20, max = 7000)

@@ -2,6 +2,7 @@ package ru.practicum.controller.users.userid.events;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.EventFullDto;
@@ -25,6 +26,7 @@ public class UsersPrivateEventsController {
     private final EventService eventService;
     private final RequestsService requestsService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public EventFullDto postForInitiator(@PathVariable long userId,
                                          @RequestBody @Validated NewEventDto newEventDto) {
