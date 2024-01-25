@@ -28,7 +28,7 @@ public class UsersPrivateEventsController {
 
     @PostMapping
     public EventFullDto postForInitiator(@PathVariable long userId,
-                                         @RequestBody /*@Validated(PostValidation.class)*/ @Valid NewEventDto newEventDto) {
+                                         @RequestBody @Validated/*(PostValidation.class)*//* @Valid*/ NewEventDto newEventDto) {
         log.info("🟫🟫 POST /users/{}/events", userId);
         return eventService.createForInitiator(userId, newEventDto);
     }

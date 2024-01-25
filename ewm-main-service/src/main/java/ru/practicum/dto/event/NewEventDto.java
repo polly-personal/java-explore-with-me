@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.dto.PostValidation;
 import ru.practicum.dto.location.LocationDto;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 
 import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 
-/*@Validated*/
+@Validated
 @Jacksonized
 @Builder
 @Data
@@ -26,7 +27,7 @@ public class NewEventDto {
     private Long category;
 
     @Size(min = 20, max = 7000)
-    @NotEmpty(message = "поле \"description\" должно быть заполнено", groups = PostValidation.class)
+    @NotEmpty(message = "поле \"description\" должно быть заполнено"/*, groups = PostValidation.class*/)
     private String description;
 
     @Future(message = "поле \"eventDate\" должно быть в будущем", groups = PostValidation.class)
