@@ -2,6 +2,7 @@ package ru.practicum.controller.admin.categories;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CategoryDto;
@@ -16,6 +17,7 @@ import ru.practicum.service.categories.CategoryService;
 public class AdminCategoriesController {
     private final CategoryService categoryService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public CategoryDto post(@RequestBody @Validated NewCategoryDto newCategoryDto) {
         log.info("🟫🟫 POST /admin/categories");

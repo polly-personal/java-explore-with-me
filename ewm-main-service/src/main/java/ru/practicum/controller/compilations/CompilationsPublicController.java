@@ -25,8 +25,8 @@ public class CompilationsPublicController {
 
     @GetMapping
     public List<CompilationDto> getAllForPublicUsersByParameters(@RequestParam(required = false) Boolean pinned,
-                                                                 @RequestParam(defaultValue = "0") int from,
-                                                                 @RequestParam(defaultValue = "10") int size) {
+                                                                 @RequestParam(required = false, defaultValue = "0") int from,
+                                                                 @RequestParam(required = false, defaultValue = "10") int size) {
         log.info("🟫🟫 GET /compilations?pinned={}&from={}&size={}", pinned, from, size);
         return compilationService.getAllForPublicUsersByParameters(pinned, from, size);
     }

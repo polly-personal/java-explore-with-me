@@ -13,6 +13,7 @@ import ru.practicum.exception.MainExceptionIncorrectDateTime;
 import ru.practicum.service.event.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -50,8 +51,8 @@ public class EventsPublicController {
                                                     @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime rangeEnd,
                                                     @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                     @RequestParam(defaultValue = "VIEWS") String sort,
-                                                    @RequestParam(defaultValue = "0") int from,
-                                                    @RequestParam(defaultValue = "10") int size,
+                                                    @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
+                                                    @RequestParam(required = false, defaultValue = "10") @Min(1) int size,
                                                     HttpServletRequest request) {
         log.info("🟫🟫 GET /events?text={}&categories={}&paid={}&rangeStart={}&rangeEnd={}&onlyAvailable={}&sort" +
                 "={}&from={}&size={}", text, categoryIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);

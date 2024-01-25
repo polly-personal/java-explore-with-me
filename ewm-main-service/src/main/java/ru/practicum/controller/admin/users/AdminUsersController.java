@@ -2,6 +2,7 @@ package ru.practicum.controller.admin.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.user.NewUserRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 public class AdminUsersController {
     private final UserService userService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public UserDto create(@RequestBody @Validated NewUserRequest newUserRequest) {
         log.info("🟫🟫 POST /admin/users");
