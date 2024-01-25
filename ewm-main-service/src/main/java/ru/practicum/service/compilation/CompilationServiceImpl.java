@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.compilation.CompilationDto;
@@ -80,8 +79,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     public List<CompilationDto> getAllForPublicUsersByParameters(Boolean pinned, int from, int size) {
-        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, Sort.Direction.ASC, "id");
-        /*PageRequest pageRequest = PageRequest.of(from, size);*/
+        PageRequest pageRequest = PageRequest.of(from, size);
         Page<Compilation> compilations = compilationRepository.findAllByPinned(pinned, pageRequest);
 
         log.info("🟦 для публичных пользователей выданы списки подборок: " + compilations.toList());
