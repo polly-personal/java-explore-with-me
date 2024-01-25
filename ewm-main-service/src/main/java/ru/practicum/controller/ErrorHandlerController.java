@@ -78,6 +78,21 @@ public class ErrorHandlerController {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handelMainExceptionImpossibleToPublicGetEntity(MainExceptionImpossibleToPublicGetEntity e) {
+        ApiError apiError = ApiError.builder()
+                .errors(List.of(e.getStackTrace()).subList(0, 1))
+                .status("404 NOT_FOUND")
+                .reason("The required object was not found.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        log.warn("🟥📱 объект/сущность/dto не найден или не доступен: " + apiError.toString());
+        return apiError;
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handelConstraintViolationException(ConstraintViolationException e) {
         ApiError apiError = ApiError.builder()
