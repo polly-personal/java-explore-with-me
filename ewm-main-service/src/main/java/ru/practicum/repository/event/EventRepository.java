@@ -19,7 +19,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "where (cast(e.event_date as date)) between :start and :end " +
             "and (e.initiator_id in :users or :users is null) " +
             "and (e.state in :states or :states is null) " +
-            "and (e.category_id in :categories or :categories is null) " +
             "and (e.category_id in :categories or :categories is null) ",
             nativeQuery = true)
     Page<Event> getAllForAdmin(List<Long> users, List<String> states, List<Long> categories, LocalDateTime start, LocalDateTime end, PageRequest pageRequest);
@@ -34,6 +33,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and (cast(e.event_date as date)) between :rangeStart and :rangeEnd ",
             nativeQuery = true
     )
-    List<Event> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart,
-                                     LocalDateTime rangeEnd, PageRequest pageRequest);
+    List<Event> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, PageRequest pageRequest);
 }
