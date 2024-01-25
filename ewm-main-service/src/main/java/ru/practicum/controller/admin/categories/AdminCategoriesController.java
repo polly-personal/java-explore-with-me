@@ -21,7 +21,7 @@ public class AdminCategoriesController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public CategoryDto post(@RequestBody /*@Validated(PostValidation.class)*/ @Valid NewCategoryDto newCategoryDto) {
+    public CategoryDto post(@RequestBody @Valid NewCategoryDto newCategoryDto) {
         log.info("🟫🟫 POST /admin/categories");
         return categoryService.create(newCategoryDto);
     }
