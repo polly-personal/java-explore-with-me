@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.CreateValidation;
@@ -25,6 +26,7 @@ import static ru.practicum.constant.StatsConstant.DATE_TIME_PATTERN;
 public class StatsController {
     private final StatsService statsService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/hit")
     public EndpointHitDto create(@Validated(CreateValidation.class) @RequestBody EndpointHitDto endpointHitDto) {
         log.info("🟫 POST /hit");
