@@ -34,6 +34,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and (cast(e.event_date as date)) between :rangeStart and :rangeEnd ",
             nativeQuery = true
     )
-    Page<Event> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart,
+    List<Event> getAllForPublicUsers(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart,
                                      LocalDateTime rangeEnd, PageRequest pageRequest);
 }

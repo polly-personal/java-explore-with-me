@@ -272,7 +272,8 @@ public class EventServiceImpl implements EventService {
         }
         PageRequest pageRequest = PageRequest.of(from, size, repoSort);
         /*PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, repoSort);*/
-        Page<Event> eventPages = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd, pageRequest);
+        List<Event> eventPages = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd,
+                pageRequest);
 
         List<ConfirmedRequestShortDto> requestRepoResult = requestsRepository.getCountConfirmedRequestsForAllEvents();
         Map<Long, Integer> countPublishedRequestsForAllEvents = new HashMap<>();
@@ -280,7 +281,7 @@ public class EventServiceImpl implements EventService {
             countPublishedRequestsForAllEvents.put(counts.getEventId(), counts.getCount());
         }
 
-        List<Event> events = eventPages.toList();
+        List<Event> events = eventPages/*.toList()*/;
 
         if (onlyAvailable) {
             events = events.stream()
