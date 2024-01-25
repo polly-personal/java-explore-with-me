@@ -54,10 +54,10 @@ public class RequestsServiceImpl implements RequestsService {
                 .event(event)
                 .requester(user)
                 .build();
-        if (event.getRequestModeration().equals(false)) {
-            request.setStatus(RequestStatus.CONFIRMED);
-        } else {
+        if (event.getRequestModeration() && event.getParticipantLimit() != 0) {
             request.setStatus(RequestStatus.PENDING);
+        } else {
+            request.setStatus(RequestStatus.CONFIRMED);
         }
 
         Request repoRequest = requestsRepository.save(request);

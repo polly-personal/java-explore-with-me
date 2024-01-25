@@ -63,6 +63,21 @@ public class ErrorHandlerController {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handelMainExceptionIncorrectDateTime(MainExceptionIncorrectDateTime e) {
+        ApiError apiError = ApiError.builder()
+                .errors(List.of(e.getStackTrace()).subList(0, 1))
+                .status("409 CONFLICT")
+                .reason("For the requested operation the conditions are not met.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        log.warn("🟥📱 запрос составлен некорректно (время и дата не удовлетворяет правилам создания): " + apiError.toString());
+        return apiError;
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handelMethodArgumentNotValidException(MainExceptionIdNotFound e) {
         ApiError apiError = ApiError.builder()
@@ -104,21 +119,6 @@ public class ErrorHandlerController {
                 .build();
 
         log.warn("🟥📱 нарушение целостности данных в бд: " + apiError.toString());
-        return apiError;
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handelMainExceptionIncorrectDateTime(MainExceptionIncorrectDateTime e) {
-        ApiError apiError = ApiError.builder()
-                .errors(List.of(e.getStackTrace()).subList(0, 1))
-                .status("409 CONFLICT")
-                .reason("For the requested operation the conditions are not met.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        log.warn("🟥📱 время и дата не удовлетворяет правилам создания: " + apiError.toString());
         return apiError;
     }
 
