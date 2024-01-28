@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @ToString
 @Setter
 @Getter
@@ -32,8 +32,7 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
-    @JoinColumn(name = "location_id")
-    @ManyToOne
+    @Embedded
     private Location location;
 
     @Column(name = "is_paid")
@@ -59,6 +58,4 @@ public class Event {
 
     @Enumerated(EnumType.STRING)
     private EventState state;
-
-    private int views;
 }

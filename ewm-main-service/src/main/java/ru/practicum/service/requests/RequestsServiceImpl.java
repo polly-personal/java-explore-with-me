@@ -62,7 +62,7 @@ public class RequestsServiceImpl implements RequestsService {
 
         Request repoRequest = requestsRepository.save(request);
 
-        log.info("🟩 создан запрос: " + repoRequest);
+        log.info("🟩 создан запрос={}", repoRequest);
         return RequestsMapper.toParticipationRequestDto(repoRequest);
     }
 
@@ -74,7 +74,7 @@ public class RequestsServiceImpl implements RequestsService {
         request.setStatus(RequestStatus.CANCELED);
         Request repoRequest = requestsRepository.save(request);
 
-        log.info("🟪 обновлен запрос_на_участие: " + repoRequest);
+        log.info("🟪 обновлен запрос_на_участие={}", repoRequest);
         return RequestsMapper.toParticipationRequestDto(repoRequest);
     }
 
@@ -85,10 +85,10 @@ public class RequestsServiceImpl implements RequestsService {
         Event event = eventService.checkInitiatorIdIsLinkedToEventId(initiatorId, eventId);
 
         List<Request> requests = requestsRepository.findAllByIdInAndEventId(request.getRequestIds(), eventId);
-        RequestStatus requestStatus = request.getStatus();
+
+        EventRequestStatusUpdateRequest.Status newStatus = request.getStatus();
         Integer limit = event.getParticipantLimit();
-        AtomicReference<Integer> countConfirmedRequests =
-                new AtomicReference<>(countConfirmedParticipantsEvent(eventId));
+        AtomicReference<Integer> countConfirmedRequests = new AtomicReference<>(countConfirmedParticipantsEvent(eventId));
 
         if (limit > 0 && limit <= countConfirmedRequests.get()) {
             throw new MainExceptionImpossibleToCreateOrUpdateEntity("у события достигнут лимит запросов на участие");
@@ -101,7 +101,10 @@ public class RequestsServiceImpl implements RequestsService {
                     throw new MainExceptionImpossibleToCreateOrUpdateEntity("статус можно изменить только у заявок, находящихся в состоянии ожидания");
 
                 if (limit > countConfirmedRequests.get()) {
-                    req.setStatus(requestStatus);
+                    if (newStatus.equals(EventRequestStatusUpdateRequest.Status.CONFIRMED))
+                        req.setStatus(RequestStatus.CONFIRMED);
+                    if (newStatus.equals(EventRequestStatusUpdateRequest.Status.REJECTED))
+                        req.setStatus(RequestStatus.REJECTED);
                 } else {
                     req.setStatus(RequestStatus.REJECTED);
                 }
@@ -121,6 +124,8 @@ public class RequestsServiceImpl implements RequestsService {
                 .confirmedRequests(RequestsMapper.toParticipationRequestDtos(confirmedRequests))
                 .rejectedRequests(RequestsMapper.toParticipationRequestDtos(rejectedRequests))
                 .build();
+
+        log.info("🟪 обновлен список запросов_на_участие={}", result);
         return result;
     }
 
@@ -133,7 +138,7 @@ public class RequestsServiceImpl implements RequestsService {
         userService.checkAndGetEntityById(requesterId);
         List<Request> requests = requestsRepository.findAllByRequesterId(requesterId);
 
-        log.info("🟦 выдан список запросов_на_участие_в_СОБЫТИЯХ: " + requests);
+        log.info("🟦 выдан список запросов_на_участие_в_СОБЫТИЯХ={}", requests);
         return RequestsMapper.toParticipationRequestDtos(requests);
     }
 
@@ -142,7 +147,7 @@ public class RequestsServiceImpl implements RequestsService {
         eventService.checkAndGetEntityById(eventId);
         List<Request> requests = requestsRepository.findAllByEventIdAndEventInitiatorId(eventId, initiatorId);
 
-        log.info("🟦 выдан список запросов_на_участие_в_СОБЫТИИ: " + requests);
+        log.info("🟦 выдан список запросов_на_участие_в_СОБЫТИИ={}", requests);
         return RequestsMapper.toParticipationRequestDtos(requests);
     }
 

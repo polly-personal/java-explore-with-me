@@ -25,7 +25,7 @@ public class EventMapper {
                 .title(newEventDto.getTitle())
                 .build();
 
-        log.info("🔀\nDTO: " + newEventDto + " сконвертирован в \nJPA-сущность: " + event);
+        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", newEventDto, event);
         return event;
     }
 
@@ -45,10 +45,9 @@ public class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState())
                 .title(event.getTitle())
-                .views(event.getViews())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + event + " сконвертирована в \nDTO: " + eventFullDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", event, eventFullDto);
         return eventFullDto;
     }
 
@@ -57,7 +56,7 @@ public class EventMapper {
                 .map(EventMapper::toEventFullDto)
                 .collect(Collectors.toList());
 
-        log.info("🔀 \nсписок JPA-сущностей: " + events + " сконвертирован в \nсписок DTO: " + eventFullDtos);
+        log.info("🔀 \nсписок JPA-сущностей={} сконвертирован в \nсписок DTO={}", events, eventFullDtos);
         return eventFullDtos;
     }
 
@@ -70,10 +69,9 @@ public class EventMapper {
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
-                .views(event.getViews())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + event + " сконвертирована в \nDTO: " + eventShortDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", event, eventShortDto);
         return eventShortDto;
     }
 
@@ -82,7 +80,7 @@ public class EventMapper {
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
 
-        log.info("🔀 \nсписок JPA-сущностей: " + events + " сконвертирован в \nсписок DTO: " + eventShortDtos);
+        log.info("🔀 \nсписок JPA-сущностей={} сконвертирован в \nсписок DTO={}", events, eventShortDtos);
         return eventShortDtos;
     }
 }

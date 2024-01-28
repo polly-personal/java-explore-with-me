@@ -5,15 +5,13 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.List;
+import java.util.Set;
 
 @Builder
 @Data
-public class NewCompilationDto { // In
-    /*@NotNull(message = "поле \"events\" должно быть заполнено")*/
-    private List<Long> events;
+public class NewCompilationDto {
+    private Set<Long> events;
 
-    /*@NotNull(message = "поле \"pinned\" должно быть заполнено")*/
     private Boolean pinned;
 
     @Size(min = 1, max = 50)

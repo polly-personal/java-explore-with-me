@@ -4,11 +4,11 @@ import lombok.*;
 import ru.practicum.entity.event.Event;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @ToString
 @Setter
 @Getter
@@ -24,7 +24,8 @@ public class Compilation {
     @Column(name = "is_pinned")
     private Boolean pinned;
 
+    @ToString.Exclude
     @JoinTable(name = "compilations_events", joinColumns = @JoinColumn(name = "compilation_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
     @ManyToMany
-    private List<Event> events;
+    private Set<Event> events;
 }

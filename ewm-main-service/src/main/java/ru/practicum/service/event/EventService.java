@@ -13,7 +13,7 @@ public interface EventService {
 
     EventFullDto updateForAdminByEventId(long eventId, UpdateEventAdminRequest updateEventAdminRequest);
 
-    EventFullDto updateEventForInitiatorByInitiatorIdAndEventId(long initiatorId, long eventId, UpdateEventUserRequest updateEventUserRequest);
+    EventFullDto updateForInitiatorByInitiatorIdAndEventId(long initiatorId, long eventId, UpdateEventUserRequest updateEventUserRequest);
 
     Event checkAndGetEntityById(long id);
 

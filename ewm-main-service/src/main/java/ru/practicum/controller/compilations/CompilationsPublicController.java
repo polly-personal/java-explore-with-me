@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.service.compilation.CompilationService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -19,14 +21,14 @@ public class CompilationsPublicController {
 
     @GetMapping("/{compId}")
     public CompilationDto getForPublicUsersById(@PathVariable(name = "compId") long id) {
-        log.info("🟫🟫 GET /compilations/{compId}", id);
+        log.info("🟫🟫 GET /compilations/{}", id);
         return compilationService.getForPublicUsersById(id);
     }
 
     @GetMapping
     public List<CompilationDto> getAllForPublicUsersByParameters(@RequestParam(required = false) Boolean pinned,
-                                                                 @RequestParam(required = false, defaultValue = "0") int from,
-                                                                 @RequestParam(required = false, defaultValue = "10") int size) {
+                                                                 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                                 @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("🟫🟫 GET /compilations?pinned={}&from={}&size={}", pinned, from, size);
         return compilationService.getAllForPublicUsersByParameters(pinned, from, size);
     }

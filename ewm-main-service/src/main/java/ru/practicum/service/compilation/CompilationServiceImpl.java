@@ -16,8 +16,9 @@ import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.repository.compilation.CompilationRepository;
 import ru.practicum.repository.event.EventRepository;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -31,15 +32,15 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto create(NewCompilationDto newCompilationDto) {
         if (newCompilationDto.getPinned() == null) newCompilationDto.setPinned(false);
 
-        List<Event> events;
+        Set<Event> events;
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            events = eventRepository.findAllById(newCompilationDto.getEvents());
+            events = Set.copyOf(eventRepository.findAllById(newCompilationDto.getEvents()));
         } else {
-            events = new ArrayList<>();
+            events = new HashSet<>();
         }
         Compilation compilation = compilationRepository.save(CompilationMapper.toCompilation(newCompilationDto, events));
 
-        log.info("🟩 администратором создана подборка: " + compilation);
+        log.info("🟩 администратором создана подборка={}", compilation);
         return CompilationMapper.toCompilationDto(compilation);
     }
 
@@ -48,14 +49,14 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = checkAndGetEntityById(id);
 
         if (updateCompilationRequest.getEvents() != null && updateCompilationRequest.getEvents().size() != 0)
-            compilation.setEvents(eventRepository.findAllById(updateCompilationRequest.getEvents()));
+            compilation.setEvents(Set.copyOf(eventRepository.findAllById(updateCompilationRequest.getEvents())));
 
         if (updateCompilationRequest.getPinned() != null) compilation.setPinned(updateCompilationRequest.getPinned());
 
-        if (updateCompilationRequest.getTitle() != null && !updateCompilationRequest.getTitle().isEmpty())
+        if (updateCompilationRequest.getTitle() != null && !updateCompilationRequest.getTitle().isBlank())
             compilation.setTitle(updateCompilationRequest.getTitle());
 
-        log.info("🟪 администратором обновлена подборка: " + compilation);
+        log.info("🟪 администратором обновлена подборка={}", compilation);
         return CompilationMapper.toCompilationDto(compilation);
     }
 
@@ -63,7 +64,7 @@ public class CompilationServiceImpl implements CompilationService {
     public void deleteForAdminById(long id) {
         checkAndGetEntityById(id);
         compilationRepository.deleteById(id);
-        log.info("⬛️ администратором удалена подборка по ее id: " + id);
+        log.info("⬛️ администратором удалена подборка по ее id={}", id);
     }
 
     public Compilation checkAndGetEntityById(long id) {
@@ -74,7 +75,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getForPublicUsersById(long id) {
         Compilation compilation = checkAndGetEntityById(id);
 
-        log.info("🟦 для публичных пользователей выдана подборка: " + compilation);
+        log.info("🟦 для публичных пользователей выдана подборка={}", compilation);
         return CompilationMapper.toCompilationDto(compilation);
     }
 
@@ -82,7 +83,7 @@ public class CompilationServiceImpl implements CompilationService {
         PageRequest pageRequest = PageRequest.of(from, size);
         Page<Compilation> compilations = compilationRepository.findAllByPinned(pinned, pageRequest);
 
-        log.info("🟦 для публичных пользователей выданы списки подборок: " + compilations.toList());
+        log.info("🟦 для публичных пользователей выданы списки подборок={}", compilations.toList());
         return CompilationMapper.toCompilationDtos(compilations.toList());
     }
 }

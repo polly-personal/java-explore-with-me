@@ -15,6 +15,8 @@ import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.service.event.EventService;
 import ru.practicum.service.requests.RequestsService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -28,18 +30,17 @@ public class UsersPrivateEventsController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public EventFullDto postForInitiator(@PathVariable long userId,
-                                         @RequestBody @Validated NewEventDto newEventDto) {
+    public EventFullDto postForInitiator(@PathVariable long userId, @RequestBody @Validated NewEventDto newEventDto) {
         log.info("🟫🟫 POST /users/{}/events", userId);
+        log.info("🟤 пришедшие параметры: userId={}, newEventDto={}", userId, newEventDto);
         return eventService.createForInitiator(userId, newEventDto);
     }
 
     @PatchMapping("{eventId}")
-    public EventFullDto patchEventForInitiatorByInitiatorIdAndEventId(@PathVariable(name = "userId") long initiatorId,
-                                                                      @PathVariable long eventId,
-                                                                      @RequestBody @Validated UpdateEventUserRequest updateEventUserRequest) {
+    public EventFullDto patchForInitiatorByInitiatorIdAndEventId(@PathVariable(name = "userId") long initiatorId, @PathVariable long eventId, @RequestBody @Validated UpdateEventUserRequest updateEventUserRequest) {
         log.info("🟫🟫 GET /users/{}/events/{}", initiatorId, eventId);
-        return eventService.updateEventForInitiatorByInitiatorIdAndEventId(initiatorId, eventId, updateEventUserRequest);
+        log.info("🟤 пришедшие параметры: initiatorId={}, eventId={}, updateEventUserRequest={}", initiatorId, eventId, updateEventUserRequest);
+        return eventService.updateForInitiatorByInitiatorIdAndEventId(initiatorId, eventId, updateEventUserRequest);
     }
 
     @PatchMapping("{eventId}/requests")
@@ -48,21 +49,20 @@ public class UsersPrivateEventsController {
                                                                                                 @RequestBody
                                                                                                 @Validated EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         log.info("🟫🟫 GET /users/{}/events/{}/requests", initiatorId, eventId);
-        return requestsService.updateEventRequestsForInitiatorByInitiatorIdAndEventId(initiatorId, eventId,
-                eventRequestStatusUpdateRequest);
+        log.info("🟤 пришедшие параметры: initiatorId={}, eventId={}, eventRequestStatusUpdateRequest={}", initiatorId, eventId, eventRequestStatusUpdateRequest);
+        return requestsService.updateEventRequestsForInitiatorByInitiatorIdAndEventId(initiatorId, eventId, eventRequestStatusUpdateRequest);
     }
 
     @GetMapping("{eventId}")
-    public EventFullDto getForInitiatorByInitiatorIdAndEventId(@PathVariable(name = "userId") long initiatorId,
-                                                               @PathVariable long eventId) {
+    public EventFullDto getForInitiatorByInitiatorIdAndEventId(@PathVariable(name = "userId") long initiatorId, @PathVariable long eventId) {
         log.info("🟫🟫 GET /users/{}/events/{}", initiatorId, eventId);
         return eventService.getForInitiatorByInitiatorIdAndEventId(initiatorId, eventId);
     }
 
     @GetMapping
     public List<EventShortDto> getAllForInitiatorByInitiatorId(@PathVariable(name = "userId") long initiatorId,
-                                                               @RequestParam(required = false, defaultValue = "0") int from,
-                                                               @RequestParam(required = false, defaultValue = "10") int size) {
+                                                               @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                               @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("🟫🟫 GET /users/{}/events", initiatorId);
         return eventService.getAllForInitiatorByInitiatorId(from, size, initiatorId);
     }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,9 +18,10 @@ import java.util.List;
 @RestControllerAdvice
 public class ErrorHandlerController {
 
-    @ExceptionHandler
+    /* наследники от Runtime */
+    @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class, MainExceptionIncorrectDateTime.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handelMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ApiError handelRuntimeException(RuntimeException e) {
         ApiError apiError = ApiError.builder()
                 .errors(List.of(e.getStackTrace()).subList(0, 1))
                 .status("400 BAD_REQUEST")
@@ -28,13 +30,14 @@ public class ErrorHandlerController {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        log.warn("🟥📱 запрос составлен некорректно (некорректный json): " + apiError.toString());
+        log.warn("🟥📱 запрос составлен некорректно: " + apiError.toString());
         return apiError;
     }
 
-    @ExceptionHandler
+    /* наследники от Throwable */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handelMethodArgumentNotValidException(MethodArgumentTypeMismatchException e) {
+    public ApiError handelMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         ApiError apiError = ApiError.builder()
                 .errors(List.of(e.getStackTrace()).subList(0, 1))
                 .status("400 BAD_REQUEST")
@@ -43,26 +46,11 @@ public class ErrorHandlerController {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        log.warn("🟥📱 запрос составлен некорректно (некорректное значение переменной пути): " + apiError.toString());
+        log.warn("🟥📱 запрос составлен некорректно (некорректное значение переменной пути/параметра запроса): " + apiError.toString());
         return apiError;
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handelMainExceptionIncorrectDateTime(MainExceptionIncorrectDateTime e) {
-        ApiError apiError = ApiError.builder()
-                .errors(List.of(e.getStackTrace()).subList(0, 1))
-                .status("409 CONFLICT")
-                .reason("For the requested operation the conditions are not met.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        log.warn("🟥📱 запрос составлен некорректно (время и дата не удовлетворяет правилам создания): " + apiError.toString());
-        return apiError;
-    }
-
-    @ExceptionHandler
+    @ExceptionHandler(MainExceptionIdNotFound.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handelMethodArgumentNotValidException(MainExceptionIdNotFound e) {
         ApiError apiError = ApiError.builder()
@@ -77,7 +65,7 @@ public class ErrorHandlerController {
         return apiError;
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MainExceptionImpossibleToPublicGetEntity.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handelMainExceptionImpossibleToPublicGetEntity(MainExceptionImpossibleToPublicGetEntity e) {
         ApiError apiError = ApiError.builder()
@@ -92,7 +80,7 @@ public class ErrorHandlerController {
         return apiError;
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MainExceptionIncompatibleIds.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handelMainExceptionInitiatorIdNotLinkedToEventId(MainExceptionIncompatibleIds e) {
         ApiError apiError = ApiError.builder()
@@ -107,7 +95,7 @@ public class ErrorHandlerController {
         return apiError;
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handelConstraintViolationException(ConstraintViolationException e) {
         ApiError apiError = ApiError.builder()
@@ -122,7 +110,7 @@ public class ErrorHandlerController {
         return apiError;
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MainExceptionImpossibleToCreateOrUpdateEntity.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handelMainExceptionImpossibleToCreateEntity(MainExceptionImpossibleToCreateOrUpdateEntity e) {
         ApiError apiError = ApiError.builder()
@@ -136,4 +124,21 @@ public class ErrorHandlerController {
         log.warn("🟥📱 сущность не удовлетворяет правилам редактирования: " + apiError.toString());
         return apiError;
     }
+
+/*
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handelThrowable(Throwable e) {
+        ApiError apiError = ApiError.builder()
+                .errors(List.of(e.getStackTrace()).subList(0, 1))
+                .status("500 INTERNAL_SERVER_ERROR")
+                .reason("Server error")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        log.warn("🟥📱 ошибка сервера: " + apiError.toString());
+        return apiError;
+    }
+*/
 }

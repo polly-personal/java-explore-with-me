@@ -19,7 +19,7 @@ public class UserMapper {
                 .name(newUserRequest.getName())
                 .build();
 
-        log.info("🔀\nDTO: " + newUserRequest + " сконвертирован в \nJPA-сущность: " + user);
+        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", newUserRequest, user);
         return user;
     }
 
@@ -29,7 +29,7 @@ public class UserMapper {
                 .name(user.getName())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + user + " сконвертирована в \nDTO: " + userShortDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", user, userShortDto);
         return userShortDto;
     }
 
@@ -40,7 +40,7 @@ public class UserMapper {
                 .name(user.getName())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + user + " сконвертирована в \nDTO: " + userDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", user, userDto);
         return userDto;
     }
 
@@ -49,7 +49,7 @@ public class UserMapper {
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
 
-        log.info("🔀 \nсписок JPA-сущностей: " + users + " сконвертирован в \nсписок DTO: " + userDtos);
+        log.info("🔀 \nсписок JPA-сущностей={} сконвертирован в \nсписок DTO={}", users, userDtos);
         return userDtos;
     }
 }

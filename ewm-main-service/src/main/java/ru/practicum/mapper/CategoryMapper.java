@@ -17,7 +17,7 @@ public class CategoryMapper {
                 .name(newCategoryDto.getName())
                 .build();
 
-        log.info("🔀\nDTO: " + newCategoryDto + " сконвертирован в \nJPA-сущность: " + category);
+        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", newCategoryDto, category);
         return category;
     }
 
@@ -26,7 +26,7 @@ public class CategoryMapper {
                 .name(categoryDto.getName())
                 .build();
 
-        log.info("🔀\nDTO: " + categoryDto + " сконвертирован в \nJPA-сущность: " + category);
+        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", categoryDto, category);
         return category;
     }
 
@@ -36,7 +36,7 @@ public class CategoryMapper {
                 .name(category.getName())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + category + " сконвертирована в \nDTO: " + categoryDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", category, categoryDto);
         return categoryDto;
     }
 
@@ -45,7 +45,7 @@ public class CategoryMapper {
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
 
-        log.info("🔀 \nсписок JPA-сущностей: " + categories + " сконвертирован в \nсписок DTO: " + categoryDtos);
+        log.info("🔀 \nсписок JPA-сущностей={} сконвертирован в \nсписок DTO={}", categories, categoryDtos);
         return categoryDtos;
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.service.categories.CategoryService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -19,14 +21,14 @@ public class CategoriesPublicController {
 
     @GetMapping("/{catId}")
     public CategoryDto getById(@PathVariable(name = "catId") long id) {
-        log.info("🟫🟫 GET /categories/{catId}", id);
+        log.info("🟫🟫 GET /categories/{}", id);
         return categoryService.getById(id);
     }
 
     @GetMapping
-    public List<CategoryDto> getAll(@RequestParam(required = false, defaultValue = "0") int from,
-                                    @RequestParam(required = false, defaultValue = "10") int size) {
-        log.info("🟫🟫 GET /categories?{from}=from&{size}=size", from, size);
+    public List<CategoryDto> getAll(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                    @RequestParam(defaultValue = "10") @Positive int size) {
+        log.info("🟫🟫 GET /categories?from={}&size={}", from, size);
         return categoryService.getAll(from, size);
     }
 }

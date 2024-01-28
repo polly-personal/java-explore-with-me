@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto create(NewCategoryDto newCategoryDto) {
         Category category = categoryRepository.save(CategoryMapper.toCategory(newCategoryDto));
 
-        log.info("🟩 создана категория: " + category);
+        log.info("🟩 создана категория={}", category);
         return CategoryMapper.toCategoryDto(category);
     }
 
@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(categoryDto.getName());
         Category updateCategory = categoryRepository.save(category);
 
-        log.info("🟪 обновлено поле \"name\": " + updateCategory);
+        log.info("🟪 обновлено поле \"name\"={}", updateCategory);
         return CategoryMapper.toCategoryDto(updateCategory);
     }
 
@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new MainExceptionIdNotFound("Category with id=" + id + " was not found"));
 
         categoryRepository.deleteById(id);
-        log.info("⬛️ удалена категория по ее id: " + id);
+        log.info("⬛️ удалена категория по ее id={}", id);
     }
 
     public Category checkAndGetEntityById(long id) {
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = checkAndGetEntityById(id);
         CategoryDto categoryDto = CategoryMapper.toCategoryDto(category);
 
-        log.info("🟦 выдана категория: " + categoryDto);
+        log.info("🟦 выдана категория={}", categoryDto);
         return categoryDto;
     }
 
@@ -71,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         List<CategoryDto> categoryDtos = CategoryMapper.toCategoryDtos(categories.toList());
 
-        log.info("🟦 выдан список вещей: " + categoryDtos);
+        log.info("🟦 выдан список вещей={}", categoryDtos);
         return categoryDtos;
     }
 }

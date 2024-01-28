@@ -9,6 +9,8 @@ import ru.practicum.dto.user.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.service.user.UserService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +25,7 @@ public class AdminUsersController {
     @PostMapping
     public UserDto create(@RequestBody @Validated NewUserRequest newUserRequest) {
         log.info("🟫🟫 POST /admin/users");
+        log.info("🟤 пришедшие параметры: newUserRequest={}", newUserRequest);
         return userService.create(newUserRequest);
     }
 
@@ -35,8 +38,8 @@ public class AdminUsersController {
 
     @GetMapping
     public List<UserDto> get(@RequestParam(required = false) List<Long> ids,
-                             @RequestParam(required = false, defaultValue = "0") int from,
-                             @RequestParam(required = false, defaultValue = "10") int size) {
+                             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                             @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("🟫🟫 GET ?ids={}&from={}&size={}", ids, from, size);
         return userService.get(ids, from, size);
     }

@@ -26,7 +26,7 @@ public class StatsServiceImpl implements StatsService {
     public EndpointHitDto create(EndpointHitDto endpointHitDto) {
         EndpointHit endpointHit = statsRepository.save(StatsMapper.toEndpointHit(endpointHitDto));
 
-        log.info("🟩 создано попадание на сайт: " + endpointHit);
+        log.info("🟩 создано попадание на сайт={} ", endpointHit);
         return StatsMapper.toEndpointHitDto(endpointHit);
     }
 
@@ -54,7 +54,7 @@ public class StatsServiceImpl implements StatsService {
                 })
                 .collect(Collectors.toList());
 
-        log.info("🟦 выдан список попаданий на сайты: " + viewStatsDtos);
+        log.info("🟦 выдан список попаданий на сайты={} ", viewStatsDtos);
         return viewStatsDtos;
     }
 }

@@ -4,12 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.dto.event.EventShortDto;
 
-import java.util.List;
+import java.util.Set;
 
 @Builder
 @Data
 public class CompilationDto {
-    private List<EventShortDto> events;
+    private Set<EventShortDto> events;
 
     private Long id;
 

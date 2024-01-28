@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 public class EndpointHitDto {
     private Long id;
 
-    @NotEmpty(message = "поле \"app\" должно быть заполнено", groups = CreateValidation.class)
     private String app;
 
     @NotEmpty(message = "поле \"uri\" должно быть заполнено", groups = CreateValidation.class)

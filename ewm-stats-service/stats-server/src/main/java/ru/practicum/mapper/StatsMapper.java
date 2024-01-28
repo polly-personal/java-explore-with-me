@@ -17,7 +17,7 @@ public class StatsMapper {
                 .timestamp(endpointHitDto.getTimestamp())
                 .build();
 
-        log.info("🔀 \nDTO: " + endpointHitDto + " сконвертирован в \nJPA-сущность: " + endpointHit);
+        log.info("🔀 \nDTO={} сконвертирован в \nJPA-сущность={}", endpointHitDto, endpointHit);
         return endpointHit;
     }
 
@@ -30,7 +30,7 @@ public class StatsMapper {
                 .timestamp(endpointHit.getTimestamp())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + endpointHit + " сконвертирована в \nDTO: " + endpointHitDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", endpointHit, endpointHitDto);
         return endpointHitDto;
     }
 }

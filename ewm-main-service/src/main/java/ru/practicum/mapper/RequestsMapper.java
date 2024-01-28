@@ -20,7 +20,7 @@ public class RequestsMapper {
                 .status(request.getStatus())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + request + " сконвертирована в \nDTO: " + participationRequestDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", request, participationRequestDto);
         return participationRequestDto;
     }
 
@@ -29,7 +29,7 @@ public class RequestsMapper {
                 .map(RequestsMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
 
-        log.info("🔀 \nсписок JPA-сущностей: " + requests + " сконвертирован в \nсписок DTO: " + participationRequestDtos);
+        log.info("🔀 \nсписок JPA-сущностей={} сконвертирован в \nсписок DTO={}", requests, participationRequestDtos);
         return participationRequestDtos;
     }
 }

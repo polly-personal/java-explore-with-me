@@ -84,7 +84,7 @@ public class BaseClient {
     }
 
     private <T, K> ResponseEntity<K> makeAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body, K response) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
         Class kClass = response.getClass();
         ResponseEntity<K> ewmServerResponse;
         try {
@@ -100,7 +100,7 @@ public class BaseClient {
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
         ResponseEntity<Object> ewmServerResponse;
         try {
@@ -115,13 +115,10 @@ public class BaseClient {
         return prepareGatewayResponse(ewmServerResponse);
     }
 
-    private HttpHeaders defaultHeaders(Long userId) {
+    private HttpHeaders defaultHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        if (userId != null) {
-            headers.set("X-Ewm-User-Id", String.valueOf(userId));
-        }
         return headers;
     }
 

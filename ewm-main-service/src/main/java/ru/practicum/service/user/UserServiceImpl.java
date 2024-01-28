@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     public UserDto create(NewUserRequest newUserRequest) {
         User user = userRepository.save(UserMapper.toUser(newUserRequest));
 
-        log.info("🟩 создан пользователь: " + user);
+        log.info("🟩 создан пользователь={}", user);
         return UserMapper.toUserDto(user);
     }
 
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(id);
 
-        log.info("⬛️ удален пользователь по id: " + id);
+        log.info("⬛️ удален пользователь по id={}", id);
     }
 
     public User checkAndGetEntityById(long id) {
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         User user = checkAndGetEntityById(id);
         UserDto userDto = UserMapper.toUserDto(user);
 
-        log.info("🟦 выдан пользователь: " + userDto);
+        log.info("🟦 выдан пользователь={}", userDto);
         return userDto;
     }
 
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
             newUserRequests = userRepository.findAllByIdIn(ids, pageRequest);
         }
         List<UserDto> userDtos = UserMapper.toUserDtos(newUserRequests.toList());
-        log.info("🟦 выдано попадание на сайт/список попаданий на сайты: " + userDtos);
+        log.info("🟦 выдано попадание на сайт/список попаданий на сайты={}", userDtos);
 
         return userDtos;
     }

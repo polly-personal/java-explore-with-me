@@ -30,6 +30,7 @@ public class StatsController {
     @PostMapping("/hit")
     public EndpointHitDto create(@Validated(CreateValidation.class) @RequestBody EndpointHitDto endpointHitDto) {
         log.info("🟫 POST /hit");
+        log.info("🟤 пришедшие параметры: endpointHitDto={}", endpointHitDto);
 
         EndpointHitDto result = statsService.create(endpointHitDto);
 

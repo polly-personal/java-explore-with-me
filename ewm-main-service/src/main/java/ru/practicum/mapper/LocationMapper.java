@@ -14,7 +14,7 @@ public class LocationMapper {
                 .lon(locationDto.getLon())
                 .build();
 
-        log.info("🔀\nDTO: " + locationDto + " сконвертирован в \nJPA-сущность: " + location);
+        log.info("🔀\nDTO: сконвертирован в \nJPA-сущность: " + locationDto, location);
         return location;
     }
 
@@ -24,7 +24,7 @@ public class LocationMapper {
                 .lon(location.getLon())
                 .build();
 
-        log.info("🔀\nDTO: " + location + " сконвертирован в \nJPA-сущность: " + locationDto);
+        log.info("🔀\nDTO: сконвертирован в \nJPA-сущность: " + locationDto, locationDto);
         return locationDto;
     }
 }

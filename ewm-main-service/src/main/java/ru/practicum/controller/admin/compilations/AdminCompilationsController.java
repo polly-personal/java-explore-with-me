@@ -22,20 +22,22 @@ public class AdminCompilationsController {
     @PostMapping
     public CompilationDto post(@RequestBody @Validated NewCompilationDto newCompilationDto) {
         log.info("🟫🟫 POST /admin/compilations");
+        log.info("🟤 пришедшие параметры: newCompilationDto={}", newCompilationDto);
         return compilationService.create(newCompilationDto);
     }
 
     @PatchMapping("/{compId}")
     public CompilationDto patch(@PathVariable(name = "compId") long id,
                                 @RequestBody @Validated UpdateCompilationRequest updateCompilationRequest) {
-        log.info("🟫🟫 PATCH /admin/compilations/{compId}", id);
+        log.info("🟫🟫 PATCH /admin/compilations/{}", id);
+        log.info("🟤 пришедшие параметры: id={}, updateCompilationRequest={}", id, updateCompilationRequest);
         return compilationService.updateForAdmin(id, updateCompilationRequest);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{compId}")
     public void deleteForAdminById(@PathVariable(name = "compId") long id) {
-        log.info("🟫🟫 DELETE /admin/compilations/{compId}", id);
+        log.info("🟫🟫 DELETE /admin/compilations/{}", id);
         compilationService.deleteForAdminById(id);
     }
 }

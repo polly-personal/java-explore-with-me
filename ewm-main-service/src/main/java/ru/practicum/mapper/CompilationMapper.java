@@ -8,31 +8,32 @@ import ru.practicum.entity.compilation.Compilation;
 import ru.practicum.entity.event.Event;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @UtilityClass
 public class CompilationMapper {
-    public Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
+    public Compilation toCompilation(NewCompilationDto newCompilationDto, Set<Event> events) {
         Compilation compilation = Compilation.builder()
                 .events(events)
                 .pinned(newCompilationDto.getPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
 
-        log.info("🔀\nDTO: " + newCompilationDto + " сконвертирован в \nJPA-сущность: " + compilation);
+        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", newCompilationDto, compilation);
         return compilation;
     }
 
     public CompilationDto toCompilationDto(Compilation compilation) {
         CompilationDto compilationDto = CompilationDto.builder()
-                .events(EventMapper.toEventShortDtos(compilation.getEvents()))
+                .events(Set.copyOf(EventMapper.toEventShortDtos(List.copyOf(compilation.getEvents()))))
                 .id(compilation.getId())
                 .pinned(compilation.getPinned())
                 .title(compilation.getTitle())
                 .build();
 
-        log.info("🔀 \nJPA-сущность: " + compilation + " сконвертирована в \nDTO: " + compilationDto);
+        log.info("🔀 \nJPA-сущность={} сконвертирована в \nDTO={}", compilation, compilationDto);
         return compilationDto;
     }
 
@@ -41,7 +42,7 @@ public class CompilationMapper {
                 .map(CompilationMapper::toCompilationDto)
                 .collect(Collectors.toList());
 
-        log.info("🔀 \nсписок JPA-сущностей: " + compilations + " сконвертирован в \nсписок DTO: " + compilationDtos);
+        log.info("🔀 \nсписок JPA-сущностей={} сконвертирован в \nсписок DTO={}", compilations, compilationDtos);
         return compilationDtos;
     }
 }

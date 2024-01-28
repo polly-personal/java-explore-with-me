@@ -6,13 +6,14 @@ import ru.practicum.entity.request.Request;
 import ru.practicum.entity.request.RequestStatus;
 
 import java.util.List;
+import java.util.Set;
 
 public interface RequestsRepository extends JpaRepository<Request, Long> {
     Request findByIdAndRequesterId(long eventId, long requesterId);
 
     List<Request> findAllByRequesterId(long requesterId);
 
-    List<Request> findAllByIdInAndEventId(List<Long> ids, long eventId);
+    List<Request> findAllByIdInAndEventId(Set<Long> ids, long eventId);
 
     List<Request> findAllByEventIdAndEventInitiatorId(long eventId, long initiatorId);
 
