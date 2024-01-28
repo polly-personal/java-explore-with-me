@@ -1,7 +1,7 @@
 package ru.practicum.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -95,14 +95,14 @@ public class ErrorHandlerController {
         return apiError;
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handelConstraintViolationException(ConstraintViolationException e) {
+    public ApiError handelConstraintViolationException(DataIntegrityViolationException e) {
         ApiError apiError = ApiError.builder()
                 .errors(List.of(e.getStackTrace()).subList(0, 1))
                 .status("409 CONFLICT")
                 .reason("Integrity constraint has been violated. OR For the requested operation the conditions are not met.")
-                .message(e.getMessage() + "; SQL [n/a]; " + e.getSQLException())
+                .message(e.getMessage() + "; SQL [n/a]; ")
                 .timestamp(LocalDateTime.now())
                 .build();
 
@@ -125,7 +125,6 @@ public class ErrorHandlerController {
         return apiError;
     }
 
-/*
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handelThrowable(Throwable e) {
@@ -140,5 +139,4 @@ public class ErrorHandlerController {
         log.warn("🟥📱 ошибка сервера: " + apiError.toString());
         return apiError;
     }
-*/
 }
