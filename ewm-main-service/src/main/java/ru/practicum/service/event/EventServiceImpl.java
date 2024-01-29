@@ -239,14 +239,16 @@ public class EventServiceImpl implements EventService {
         }
 
         List<EventShortDto> eventShortDtos = EventMapper.toEventShortDtos(events);
-        List<ViewStatsDto> viewStatsDtos = getViews(events);
+        Map<String, Integer> urlToHits = new HashMap<>();
+        for (ViewStatsDto viewStatsDto : getViews(events)) {
+            urlToHits.put(viewStatsDto.getUri(), viewStatsDto.getHits());
+        }
+
         eventShortDtos.stream()
                 .map(eventShortDto -> {
-                    if (!viewStatsDtos.isEmpty()) {
-                        Optional<ViewStatsDto> viewStatsDto = viewStatsDtos.stream()
-                                .filter(viewStats -> viewStats.getUri().equals("/events" + eventShortDto.getId()))
-                                .findFirst();
-                        if (viewStatsDto.isPresent()) eventShortDto.setViews(viewStatsDto.get().getHits());
+                    String currentUrl = "/events" + eventShortDto.getId();
+                    if (urlToHits.containsKey(currentUrl)) {
+                        eventShortDto.setViews(urlToHits.get(currentUrl));
                     }
 
                     if (countPublishedRequestsForAllEvents.containsKey(eventShortDto.getId())) {

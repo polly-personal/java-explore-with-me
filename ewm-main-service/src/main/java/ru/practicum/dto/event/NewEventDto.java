@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 
 import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 
-@Valid
 @Jacksonized
 @Builder
 @Data
@@ -34,6 +33,7 @@ public class NewEventDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_PATTERN)
     private LocalDateTime eventDate;
 
+    @Valid
     @NotNull(message = "поле \"location\" должно быть заполнено")
     private LocationDto location;
 

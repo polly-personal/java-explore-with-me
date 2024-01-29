@@ -18,10 +18,10 @@ import java.util.List;
 @RestControllerAdvice
 public class ErrorHandlerController {
 
-    /* наследники от Runtime */
-    @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class, MainExceptionIncorrectDateTime.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class,
+            MainExceptionIncorrectDateTime.class, MissingServletRequestParameterException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handelRuntimeException(RuntimeException e) {
+    public ApiError handelException(Exception e) {
         ApiError apiError = ApiError.builder()
                 .errors(List.of(e.getStackTrace()).subList(0, 1))
                 .status("400 BAD_REQUEST")
@@ -31,22 +31,6 @@ public class ErrorHandlerController {
                 .build();
 
         log.warn("🟥📱 запрос составлен некорректно: " + apiError.toString());
-        return apiError;
-    }
-
-    /* наследники от Throwable */
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handelMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        ApiError apiError = ApiError.builder()
-                .errors(List.of(e.getStackTrace()).subList(0, 1))
-                .status("400 BAD_REQUEST")
-                .reason("Incorrectly made request")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        log.warn("🟥📱 запрос составлен некорректно (некорректное значение переменной пути/параметра запроса): " + apiError.toString());
         return apiError;
     }
 
