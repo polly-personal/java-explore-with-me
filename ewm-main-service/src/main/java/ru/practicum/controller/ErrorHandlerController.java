@@ -69,7 +69,7 @@ public class ErrorHandlerController {
     public ApiError handelMainExceptionInitiatorIdNotLinkedToEventId(MainExceptionIncompatibleIds e) {
         ApiError apiError = ApiError.builder()
                 .errors(List.of(e.getStackTrace()).subList(0, 1))
-                .status("400 BAD_REQUEST")
+                .status("409 BAD_REQUEST")
                 .reason("Incorrectly made request")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
