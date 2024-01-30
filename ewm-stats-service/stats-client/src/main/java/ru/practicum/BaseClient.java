@@ -16,7 +16,7 @@ public class BaseClient {
     }
 
     protected ResponseEntity<Object> get(String path) {
-        return get(path, null, null);
+        return get(path, null, null, null);
     }
 
     protected ResponseEntity<Object> get(String path, long userId) {
@@ -27,16 +27,24 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.GET, path, userId, parameters, null);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, T body) {
-        return post(path, null, null, body);
+    protected <R> ResponseEntity<R> get(String path, @Nullable Map<String, Object> parameters, R response) {
+        return makeAndSendRequest(HttpMethod.GET, path, null, parameters, null, response);
+    }
+
+    protected <T> ResponseEntity<Object> get(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
+        return makeAndSendRequest(HttpMethod.GET, path, userId, parameters, body);
+    }
+
+    protected <T, K> ResponseEntity<K> post(String path, T body, K response) {
+        return post(path, null, null, body, response);
     }
 
     protected <T> ResponseEntity<Object> post(String path, long userId, T body) {
-        return post(path, userId, null, body);
+        return post(path, userId, null, body, null);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, userId, parameters, body);
+    protected <T, K> ResponseEntity<K> post(String path, Long userId, @Nullable Map<String, Object> parameters, T body, K response) {
+        return makeAndSendRequest(HttpMethod.POST, path, userId, parameters, body, response);
     }
 
     protected <T> ResponseEntity<Object> put(String path, long userId, T body) {
@@ -75,33 +83,46 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
-
-        ResponseEntity<Object> statsServerResponse;
+    private <T, K> ResponseEntity<K> makeAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body, K response) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
+        Class kClass = response.getClass();
+        ResponseEntity<K> ewmServerResponse;
         try {
             if (parameters != null) {
-                statsServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+                ewmServerResponse = rest.exchange(path, method, requestEntity, kClass, parameters);
             } else {
-                statsServerResponse = rest.exchange(path, method, requestEntity, Object.class);
+                ewmServerResponse = rest.exchange(path, method, requestEntity, kClass);
+            }
+        } catch (HttpStatusCodeException e) {
+            return (ResponseEntity<K>) ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+        }
+        return prepareGatewayResponse(ewmServerResponse);
+    }
+
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
+
+        ResponseEntity<Object> ewmServerResponse;
+        try {
+            if (parameters != null) {
+                ewmServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+            } else {
+                ewmServerResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
-        return prepareGatewayResponse(statsServerResponse);
+        return prepareGatewayResponse(ewmServerResponse);
     }
 
-    private HttpHeaders defaultHeaders(Long userId) {
+    private HttpHeaders defaultHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        if (userId != null) {
-            headers.set("X-Ewm-User-Id", String.valueOf(userId));
-        }
         return headers;
     }
 
-    private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
+    private static <T> ResponseEntity<T> prepareGatewayResponse(ResponseEntity<T> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
