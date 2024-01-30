@@ -70,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
 
             log.info("🟪 для администратора обновлен комментарий (закрыт) комментарий={}", updatedComment);
         }
-        if (newStatus.equals(CommentStatus.PUBLISHED) && !requestCommentDto.equals(oldComment.getText())) {
+        if (newStatus.equals(CommentStatus.PUBLISHED) && !requestCommentDto.getText().equals(oldComment.getText())) {
             oldComment.setText(requestCommentDto.getText());
             oldComment.setPublishedOn(LocalDateTime.now());
             oldComment.setStatus(CommentStatus.PUBLISHED);
