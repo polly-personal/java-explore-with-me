@@ -17,7 +17,6 @@
 							"    const api = new API(pm);\r",
 							"    const rnd = new RandomUtils();\r",
 							"\r",
-							"    // let comment\r",
 							"    try {\r",
 							"        const user = await api.addUser(rnd.getUser());\r",
 							"        pm.collectionVariables.set(\"uid\", user.id);\r",
@@ -28,10 +27,7 @@
 							"        event = await api.publishEvent(event.id);\r",
 							"        pm.collectionVariables.set(\"eid\", event.id);\r",
 							"\r",
-							"        comment = rnd.getComment();\r",
-							"        // comment.text = rnd.getWord(7000);\r",
-							"        // comment.status = \"PENDING\";\r",
-							"\r",
+							"        comment = rnd.getComment(event.id);\r",
 							"    } catch(err) { \r",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
 							"    }\r",
@@ -98,24 +94,19 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/:userId/comments/:eventId",
+					"raw": "{{baseUrl}}/users/:userId/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"users",
 						":userId",
-						"comments",
-						":eventId"
+						"comments"
 					],
 					"variable": [
 						{
 							"key": "userId",
 							"value": "{{uid}}"
-						},
-						{
-							"key": "eventId",
-							"value": "{{eid}}"
 						}
 					]
 				}
@@ -133,7 +124,6 @@
 							"    const api = new API(pm);",
 							"    const rnd = new RandomUtils();",
 							"",
-							"    // let comment",
 							"    try {",
 							"        const user = await api.addUser(rnd.getUser());",
 							"        pm.collectionVariables.set(\"uid\", user.id);",
@@ -141,13 +131,9 @@
 							"        const category = await api.addCategory(rnd.getCategory());",
 							"",
 							"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));",
-							"        // event = await api.publishEvent(event.id);",
 							"        pm.collectionVariables.set(\"eid\", event.id);",
 							"",
-							"        comment = rnd.getComment();",
-							"        // comment.text = rnd.getWord(7000);",
-							"        // comment.status = \"PENDING\";",
-							"",
+							"        comment = rnd.getComment(event.id);",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
 							"    }",
@@ -216,143 +202,20 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/:userId/comments/:eventId",
+					"raw": "{{baseUrl}}/users/:userId/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"users",
 						":userId",
-						"comments",
-						":eventId"
+						"comments"
 					],
 					"variable": [
 						{
 							"key": "userId",
 							"value": "{{uid}}",
 							"description": "(Required) id текущего пользователя"
-						},
-						{
-							"key": "eventId",
-							"value": "{{eid}}"
-						}
-					]
-				},
-				"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
-			},
-			"response": []
-		},
-		{
-			"name": "НЕ создавать, если коммент НЕ PENDING",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {",
-							"    const api = new API(pm);",
-							"    const rnd = new RandomUtils();",
-							"",
-							"    try {",
-							"        const user = await api.addUser(rnd.getUser());",
-							"        pm.collectionVariables.set(\"uid\", user.id);",
-							"",
-							"        const category = await api.addCategory(rnd.getCategory());",
-							"",
-							"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));",
-							"        event = await api.publishEvent(event.id);",
-							"        pm.collectionVariables.set(\"eid\", event.id);",
-							"",
-							"        comment = rnd.getComment();",
-							"        comment.status = \"CANCELED\";",
-							"",
-							"    } catch(err) { ",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
-							"    }",
-							"",
-							"    pm.request.body.update({",
-							"        mode: 'raw',",
-							"        raw: JSON.stringify(comment),",
-							"        options: { raw: { language: 'json' } }",
-							"    });",
-							"};",
-							"",
-							"const interval = setInterval(() => {}, 1000);",
-							"",
-							"setTimeout(async () => ",
-							"    {",
-							"        try {",
-							"            // выполняем наш скрипт",
-							"            await main();",
-							"        } catch (e) {",
-							"            console.error(e);",
-							"        } finally {",
-							"            clearInterval(interval);",
-							"        }",
-							"    },  ",
-							"    100 ",
-							");"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 409\", function () {\r",
-							"    pm.response.to.have.status(409);  \r",
-							"});\r",
-							"\r",
-							"pm.test(\"Ответ должен содержать тело\", function () {\r",
-							"    pm.response.to.be.withBody;\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Ответ должен содержать тело в формате json\", function () {\r",
-							"    pm.response.to.be.json;\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{{request_body}}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/users/:userId/comments/:eventId",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"users",
-						":userId",
-						"comments",
-						":eventId"
-					],
-					"variable": [
-						{
-							"key": "userId",
-							"value": "{{uid}}",
-							"description": "(Required) id текущего пользователя"
-						},
-						{
-							"key": "eventId",
-							"value": "{{eid}}"
 						}
 					]
 				},
@@ -377,11 +240,12 @@
 							"        const category = await api.addCategory(rnd.getCategory());",
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
-							"        const comment = await api.addComment(user.id, event.id, rnd.getComment());",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id));",
 							"",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"",
-							"        updatedComment = rnd.getComment();",
+							"        updatedComment = rnd.getComment(event.id);",
+							"        updatedComment.id = comment.id;",
 							"        updatedComment.status = \"PUBLISHED\";",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -454,20 +318,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/admin/comments/:commentId",
+					"raw": "{{baseUrl}}/admin/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"admin",
-						"comments",
-						":commentId"
-					],
-					"variable": [
-						{
-							"key": "commentId",
-							"value": "{{cid}}"
-						}
+						"comments"
 					]
 				},
 				"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
@@ -491,14 +348,17 @@
 							"        const category = await api.addCategory(rnd.getCategory());",
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
-							"        let comment = await api.addComment(user.id, event.id, rnd.getComment()); ",
+							"        ",
+							"        let comment = await api.addComment(user.id, rnd.getComment(event.id)); ",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"",
-							"        let commentForPublication = rnd.getComment();",
+							"        let commentForPublication = rnd.getComment(event.id);",
+							"        commentForPublication.id = comment.id;",
 							"        commentForPublication.status = \"PUBLISHED\";",
-							"        let publishedComment = await api.publishComment(comment.id, commentForPublication); ",
+							"        let publishedComment = await api.publishComment(commentForPublication); ",
 							"",
-							"        updatedComment = rnd.getComment(); ",
+							"        updatedComment = rnd.getComment(event.id); ",
+							"        updatedComment.id = comment.id;",
 							"        updatedComment.status = \"CANCELED\";",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -568,20 +428,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/admin/comments/:commentId",
+					"raw": "{{baseUrl}}/admin/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"admin",
-						"comments",
-						":commentId"
-					],
-					"variable": [
-						{
-							"key": "commentId",
-							"value": "{{cid}}"
-						}
+						"comments"
 					]
 				},
 				"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
@@ -608,10 +461,11 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        ",
-							"        const comment = await api.addComment(user.id, event.id, rnd.getComment());",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id));",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"",
-							"        updatedComment = rnd.getComment();",
+							"        updatedComment = rnd.getComment(event.id);",
+							"        updatedComment.id = comment.id;",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
 							"    }",
@@ -683,24 +537,19 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+					"raw": "{{baseUrl}}/users/:userId/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"users",
 						":userId",
-						"comments",
-						":commentId"
+						"comments"
 					],
 					"variable": [
 						{
 							"key": "userId",
 							"value": "{{uid}}"
-						},
-						{
-							"key": "commentId",
-							"value": "{{cid}}"
 						}
 					]
 				},
@@ -727,7 +576,7 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        ",
-							"        const comment = await api.addComment(user.id, event.id, rnd.getComment());",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id));",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -805,7 +654,7 @@
 			"response": []
 		},
 		{
-			"name": "НЕ выдавать для admin'а по id, если id НЕ найден Copy",
+			"name": "НЕ выдавать для admin'а по id, если id НЕ найден",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -823,7 +672,7 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        ",
-							"        const comment = await api.addComment(user.id, event.id, rnd.getComment());",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id));",
 							"        pm.collectionVariables.set(\"cid\", 0);",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -917,7 +766,7 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        ",
-							"        const comment = await api.addComment(user.id, event.id, rnd.getComment());",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id));",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -1018,7 +867,7 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        ",
-							"        const comment = await api.addComment(user.id, event.id, rnd.getComment());",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id));",
 							"        pm.collectionVariables.set(\"cid\", 0);",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -1117,12 +966,13 @@
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        pm.collectionVariables.set(\"eid\", event.id);",
 							"",
-							"        const comment = await api.addComment(user.id, publishedEvent.id, rnd.getComment()); ",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id)); ",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"",
-							"        let commentForPublication = rnd.getComment();",
+							"        let commentForPublication = rnd.getComment(event.id);",
+							"         commentForPublication.id = comment.id;",
 							"        commentForPublication.status = \"PUBLISHED\";",
-							"        let publishedComment = await api.publishComment(comment.id, commentForPublication); ",
+							"        let publishedComment = await api.publishComment(commentForPublication); ",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
 							"    }",
@@ -1221,7 +1071,7 @@
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        pm.collectionVariables.set(\"eid\", event.id);",
 							"",
-							"        const comment = await api.addComment(user.id, publishedEvent.id, rnd.getComment()); ",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id)); ",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
@@ -1319,16 +1169,17 @@
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"        pm.collectionVariables.set(\"eid\", event.id);",
 							"",
-							"        const comment = await api.addComment(user.id, publishedEvent.id, rnd.getComment()); ",
-							"        let commentForPublication = rnd.getComment();",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication = rnd.getComment(event.id);",
+							"        commentForPublication.id = comment.id;",
 							"        commentForPublication.status = \"PUBLISHED\";",
-							"        let publishedComment = await api.publishComment(comment.id, commentForPublication); ",
+							"        let publishedComment = await api.publishComment(commentForPublication); ",
 							"",
-							"        const comment2 = await api.addComment(user.id, publishedEvent.id, rnd.getComment()); ",
-							"        let commentForPublication2 = rnd.getComment();",
+							"        const comment2 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication2 = rnd.getComment(event.id);",
+							"        commentForPublication2.id = comment2.id;",
 							"        commentForPublication2.status = \"PUBLISHED\";",
-							"        let publishedComment2 = await api.publishComment(comment2.id, commentForPublication2); ",
-							"",
+							"        let publishedComment2 = await api.publishComment(commentForPublication2); ",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
 							"    }",
@@ -1432,12 +1283,8 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"",
-							"        const comment = await api.addComment(user.id, publishedEvent.id, rnd.getComment()); ",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id)); ",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
-							"",
-							"        // let commentForPublication = rnd.getComment();",
-							"        // commentForPublication.status = \"PUBLISHED\";",
-							"        // let publishedComment = await api.publishComment(comment.id, commentForPublication); ",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
 							"    }",
@@ -1527,12 +1374,8 @@
 							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
 							"        const publishedEvent = await api.publishEvent(event.id);",
 							"",
-							"        const comment = await api.addComment(user.id, publishedEvent.id, rnd.getComment()); ",
+							"        const comment = await api.addComment(user.id, rnd.getComment(event.id)); ",
 							"        pm.collectionVariables.set(\"cid\", comment.id);",
-							"",
-							"        // let commentForPublication = rnd.getComment();",
-							"        // commentForPublication.status = \"PUBLISHED\";",
-							"        // let publishedComment = await api.publishComment(comment.id, commentForPublication); ",
 							"    } catch(err) { ",
 							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
 							"    }",
@@ -1602,6 +1445,234 @@
 				"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
 			},
 			"response": []
+		},
+		{
+			"name": "выдавать список для pub user'а по evetId",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {",
+							"    const api = new API(pm);",
+							"    const rnd = new RandomUtils();",
+							"",
+							"    try {",
+							"        const user = await api.addUser(rnd.getUser());",
+							"        ",
+							"        const category = await api.addCategory(rnd.getCategory());",
+							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
+							"        const publishedEvent = await api.publishEvent(event.id);",
+							"        pm.collectionVariables.set(\"eid\", event.id);",
+							"",
+							"        const comment1 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication1 = rnd.getComment(event.id);",
+							"        commentForPublication1.id = comment1.id;",
+							"        commentForPublication1.status = \"PUBLISHED\";",
+							"        let publishedComment1 = await api.publishComment(commentForPublication1); ",
+							"",
+							"        const comment2 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForCancel2 = rnd.getComment(event.id);",
+							"        commentForCancel2.id = comment2.id;",
+							"        commentForCancel2.status = \"CANCELED\";",
+							"        let canseledComment2 = await api.publishComment(commentForCancel2); ",
+							"",
+							"        const comment3 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication3 = rnd.getComment(event.id);",
+							"        commentForPublication3.id = comment3.id;",
+							"        commentForPublication3.status = \"PUBLISHED\";",
+							"        let publishedComment3 = await api.publishComment(commentForPublication3); ",
+							"    } catch(err) { ",
+							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
+							"    }",
+							"};",
+							"",
+							"const interval = setInterval(() => {}, 1000);",
+							"",
+							"setTimeout(async () => ",
+							"    {",
+							"        try {",
+							"            // выполняем наш скрипт",
+							"            await main();",
+							"        } catch (e) {",
+							"            console.error(e);",
+							"        } finally {",
+							"            clearInterval(interval);",
+							"        }",
+							"    },  ",
+							"    100 ",
+							");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
+							"    pm.response.to.have.status(200);  \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать тело\", function () {\r",
+							"    pm.response.to.be.withBody;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать тело в формате json\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/events/:eventId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"events",
+						":eventId"
+					],
+					"variable": [
+						{
+							"key": "eventId",
+							"value": "{{eid}}"
+						}
+					]
+				},
+				"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+			},
+			"response": []
+		},
+		{
+			"name": "выдавать кол-во комментов для pub user'а для всех событий",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {",
+							"    const api = new API(pm);",
+							"    const rnd = new RandomUtils();",
+							"",
+							"    try {",
+							"        const user = await api.addUser(rnd.getUser());",
+							"        const category = await api.addCategory(rnd.getCategory());",
+							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
+							"        const publishedEvent = await api.publishEvent(event.id);",
+							"",
+							"        const comment1 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication1 = rnd.getComment(event.id);",
+							"        commentForPublication1.id = comment1.id;",
+							"        commentForPublication1.status = \"PUBLISHED\";",
+							"        let publishedComment1 = await api.publishComment(commentForPublication1); ",
+							"",
+							"        const comment2 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForCancel2 = rnd.getComment(event.id);",
+							"        commentForCancel2.id = comment2.id;",
+							"        commentForCancel2.status = \"CANCELED\";",
+							"        let canseledComment2 = await api.publishComment(commentForCancel2); ",
+							"",
+							"        const comment3 = await api.addComment(user.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication3 = rnd.getComment(event.id);",
+							"        commentForPublication3.id = comment3.id;",
+							"        commentForPublication3.status = \"PUBLISHED\";",
+							"        let publishedComment3 = await api.publishComment(commentForPublication3); ",
+							"        //-----------------",
+							"        const user2 = await api.addUser(rnd.getUser());",
+							"        const category2 = await api.addCategory(rnd.getCategory());",
+							"        const event2 = await api.addEvent(user2.id, rnd.getEvent(category2.id));",
+							"        const publishedEvent2 = await api.publishEvent(event2.id);",
+							"",
+							"        const comment4 = await api.addComment(user2.id, rnd.getComment(event.id)); ",
+							"        let commentForPublication4 = rnd.getComment(event.id);",
+							"        commentForPublication4.id = comment4.id;",
+							"        commentForPublication4.status = \"PUBLISHED\";",
+							"        let publishedComment4 = await api.publishComment(commentForPublication4); ",
+							"",
+							"        const comment5 = await api.addComment(user2.id, rnd.getComment(event.id)); ",
+							"        let commentForCancel5 = rnd.getComment(event.id);",
+							"        commentForCancel5.id = comment5.id;",
+							"        commentForCancel5.status = \"CANCELED\";",
+							"        let canseledComment5 = await api.publishComment(commentForCancel5); ",
+							"    } catch(err) { ",
+							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
+							"    }",
+							"};",
+							"",
+							"const interval = setInterval(() => {}, 1000);",
+							"",
+							"setTimeout(async () => ",
+							"    {",
+							"        try {",
+							"            // выполняем наш скрипт",
+							"            await main();",
+							"        } catch (e) {",
+							"            console.error(e);",
+							"        } finally {",
+							"            clearInterval(interval);",
+							"        }",
+							"    },  ",
+							"    100 ",
+							");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
+							"    pm.response.to.have.status(200);  \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать тело\", function () {\r",
+							"    pm.response.to.be.withBody;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать тело в формате json\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/events",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"events"
+					]
+				},
+				"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+			},
+			"response": []
 		}
 	],
 	"event": [
@@ -1633,12 +1704,12 @@
 					"        return this.post(\"/admin/compilations\", compilation, \"Ошибка при добавлении новой подборки: \", verbose);",
 					"    }",
 					"",
-					"    async addComment(userId, eventId, comment, verbose=null) {",
-					"        return this.post(\"/users/\" + userId + \"/comments/\" + eventId, comment, \"Ошибка при добавлении нового комментария: \", verbose);",
+					"    async addComment(userId, comment, verbose=null) {",
+					"        return this.post(\"/users/\" + userId + \"/comments/\", comment, \"Ошибка при добавлении нового комментария: \", verbose);",
 					"    }",
 					"",
-					"    async publishComment(commentId, comment, verbose=null) {",
-					"        return this.patch('/admin/comments/' + commentId, comment, \"Ошибка при публикации комментария\", verbose);",
+					"    async publishComment(comment, verbose=null) {",
+					"        return this.patch('/admin/comments', comment, \"Ошибка при публикации комментария\", verbose);",
 					"    }",
 					"",
 					"    async publishParticipationRequest(eventId, userId, verbose=null) {",
@@ -1743,10 +1814,10 @@
 					"        };",
 					"    }",
 					"",
-					"    getComment() {",
+					"    getComment(eventId) {",
 					"        return {",
-					"            text: pm.variables.replaceIn('{{$randomWord}}') + Math.floor(Math.random() * 100).toString(),",
-					"            status: \"PENDING\"",
+					"            event: eventId,",
+					"            text: pm.variables.replaceIn('{{$randomWord}}') + Math.floor(Math.random() * 100).toString()",
 					"        };",
 					"    }",
 					"",
