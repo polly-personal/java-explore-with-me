@@ -31,4 +31,6 @@ public class EventShortDto {
     private String title;
 
     private int views;
+
+    private int countComments;
 }

@@ -3,7 +3,7 @@ package ru.practicum.mapper;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.RequestCommentDto;
+import ru.practicum.dto.comment.NewCommentDto;
 import ru.practicum.entity.comment.Comment;
 
 import java.util.List;
@@ -12,13 +12,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @UtilityClass
 public class CommentMapper {
-    public Comment toComment(RequestCommentDto requestCommentDto) {
+    public Comment toComment(NewCommentDto newCommentDto) {
         Comment comment = Comment.builder()
-                .text(requestCommentDto.getText())
-                .status(requestCommentDto.getStatus())
+                .text(newCommentDto.getText())
                 .build();
 
-        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", requestCommentDto, comment);
+        log.info("🔀\nDTO={} сконвертирован в \nJPA-сущность={}", newCommentDto, comment);
         return comment;
     }
 

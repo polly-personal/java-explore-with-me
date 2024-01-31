@@ -7,7 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.RequestCommentDto;
+import ru.practicum.dto.comment.NewCommentDto;
+import ru.practicum.dto.comment.UpdateAdminCommentDto;
+import ru.practicum.dto.comment.UpdateUserCommentDto;
 import ru.practicum.entity.comment.Comment;
 import ru.practicum.entity.comment.CommentStatus;
 import ru.practicum.entity.event.Event;
@@ -18,8 +20,8 @@ import ru.practicum.exception.MainExceptionImpossibleToPublicGetEntity;
 import ru.practicum.exception.MainExceptionIncompatibleIds;
 import ru.practicum.mapper.CommentMapper;
 import ru.practicum.repository.comment.CommentRepository;
-import ru.practicum.service.event.EventService;
-import ru.practicum.service.user.UserService;
+import ru.practicum.repository.event.EventRepository;
+import ru.practicum.repository.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,38 +32,42 @@ import java.util.List;
 @Service
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-    private final UserService userService;
-    private final EventService eventService;
+    private final UserRepository userRepository;
+
+    private final EventRepository eventRepository;
 
     @Transactional
-    public CommentDto createForCommentatorByCommentatorIdAndEventId(long commentatorId, long eventId, RequestCommentDto requestCommentDto) {
-        Event event = eventService.checkAndGetEntityById(eventId);
+    @Override
+    public CommentDto createForCommentatorByCommentatorIdAndEventId(long commentatorId, NewCommentDto newCommentDto) {
+        Event event = eventRepository.findById(newCommentDto.getEvent()).orElseThrow(() -> new MainExceptionIdNotFound("Event with id=" + newCommentDto.getEvent() +
+                " was not found"));
+
         if (!event.getState().equals(EventState.PUBLISHED))
             throw new MainExceptionImpossibleToCreateOrUpdateEntity("событие должно быть в статусе 'PUBLISHED'");
 
-        if (requestCommentDto.getStatus().equals(CommentStatus.PENDING)) {
-            Comment comment = CommentMapper.toComment(requestCommentDto);
+        Comment comment = CommentMapper.toComment(newCommentDto);
 
-            comment.setCommentator(userService.checkAndGetEntityById(commentatorId));
-            comment.setEvent(event);
-            comment.setCreatedOn(LocalDateTime.now());
+        comment.setCommentator(userRepository.findById(commentatorId).orElseThrow(() -> new MainExceptionIdNotFound("User with id=" + commentatorId + " was not found")));
+        comment.setEvent(event);
+        comment.setCreatedOn(LocalDateTime.now());
+        comment.setStatus(CommentStatus.PENDING);
 
-            Comment savedComment = commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
-            log.info("🟩 создан комментарий={}", savedComment);
-            return CommentMapper.toCommentDto(savedComment);
-        }
-
-        throw new MainExceptionImpossibleToCreateOrUpdateEntity("создать новый комментарий можно только со статусом 'PENDING'");
+        log.info("🟩 создан комментарий={}", savedComment);
+        return CommentMapper.toCommentDto(savedComment);
     }
 
     @Transactional
-    public CommentDto updateForAdminByCommentId(long commentId, RequestCommentDto requestCommentDto) {
-        Comment oldComment = checkAndGetEntityById(commentId);
+    @Override
+    public CommentDto updateForAdminByCommentId(UpdateAdminCommentDto updateAdminCommentDto) {
+        Comment oldComment = checkAndGetEntityById(updateAdminCommentDto.getId());
+
         if (!oldComment.getStatus().equals(CommentStatus.PENDING))
             throw new MainExceptionImpossibleToCreateOrUpdateEntity("обновить комментарий можно только со статусом 'PENDING'");
 
-        CommentStatus newStatus = requestCommentDto.getStatus();
+        CommentStatus newStatus = updateAdminCommentDto.getStatus();
+
         Comment updatedComment = oldComment;
         if (newStatus.equals(CommentStatus.CANCELED)) {
             oldComment.setStatus(CommentStatus.CANCELED);
@@ -69,34 +75,31 @@ public class CommentServiceImpl implements CommentService {
             updatedComment = commentRepository.save(oldComment);
 
             log.info("🟪 для администратора обновлен комментарий (закрыт) комментарий={}", updatedComment);
+        } else if (newStatus.equals(CommentStatus.PUBLISHED)) {
+            if (!updateAdminCommentDto.getText().equals(oldComment.getText())) {
+
+                oldComment.setText(updateAdminCommentDto.getText());
+                oldComment.setPublishedOn(LocalDateTime.now());
+                oldComment.setStatus(CommentStatus.PUBLISHED);
+
+                updatedComment = commentRepository.save(oldComment);
+
+                log.info("🟪 для администратора обновлен (опубликован) комментарий={}", updatedComment);
+            } else {
+                log.info("🟪 для администратора НЕ обновлен комментарий, тк текст не имеет изменений={}", oldComment);
+            }
         }
-        if (newStatus.equals(CommentStatus.PUBLISHED) && !requestCommentDto.getText().equals(oldComment.getText())) {
-            oldComment.setText(requestCommentDto.getText());
-            oldComment.setPublishedOn(LocalDateTime.now());
-            oldComment.setStatus(CommentStatus.PUBLISHED);
-
-            updatedComment = commentRepository.save(oldComment);
-
-            log.info("🟪 для администратора обновлен (опубликован) комментарий={}", updatedComment);
-        } else {
-            log.info("🟪 для администратора НЕ обновлен комментарий, тк текст не имеет изменений={}", oldComment);
-        }
-
         return CommentMapper.toCommentDto(updatedComment);
     }
 
     @Transactional
-    public CommentDto updateForCommentatorByCommentatorIdAndCommentId(long commentatorId, long commentId, RequestCommentDto requestCommentDto) {
-        Comment oldComment = checkCommentatorIdIsLinkedToCommentId(commentatorId, commentId);
-        CommentStatus newStatus = requestCommentDto.getStatus();
-
-        if (newStatus.equals(CommentStatus.CANCELED))
-            throw new MainExceptionImpossibleToCreateOrUpdateEntity("коментатору нельзя \"закрывать/CANCELED\" " +
-                    "коментарий. вы можете его только удалить или изменить");
+    @Override
+    public CommentDto updateForCommentatorByCommentatorIdAndCommentId(long commentatorId, UpdateUserCommentDto updateUserCommentDto) {
+        Comment oldComment = checkCommentatorIdIsLinkedToCommentId(commentatorId, updateUserCommentDto.getId());
 
         Comment updatedComment = oldComment;
-        if (!requestCommentDto.getText().equals(oldComment.getText())) {
-            oldComment.setText(requestCommentDto.getText());
+        if (!updateUserCommentDto.getText().equals(oldComment.getText())) {
+            oldComment.setText(updateUserCommentDto.getText());
             oldComment.setUpdateDate(LocalDateTime.now());
             oldComment.setStatus(CommentStatus.PENDING);
 
@@ -110,10 +113,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDto(updatedComment);
     }
 
-    public Comment checkAndGetEntityById(long id) {
-        return commentRepository.findById(id).orElseThrow(() -> new MainExceptionIdNotFound("Comment with id=" + id + " was not found"));
-    }
-
+    @Override
     public CommentDto getForAdminByCommentId(long commentId) {
         Comment comment = checkAndGetEntityById(commentId);
 
@@ -121,6 +121,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDto(comment);
     }
 
+    @Override
     public CommentDto getForCommentatorByCommentatorIdAndCommentId(long commentatorId, long commentId) {
         Comment comment = checkAndGetEntityById(commentId);
 
@@ -128,6 +129,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDto(comment);
     }
 
+    @Override
     public CommentDto getForPublicUserByEventIdAndCommentId(long eventId, long commentId) {
         Comment comment = commentRepository.findByIdAndEventIdAndStatus(commentId, eventId, CommentStatus.PUBLISHED).orElseThrow(() -> new MainExceptionImpossibleToPublicGetEntity("комментарий должен быть опубликован и id комментария: " + commentId + " должен быть связан с id события: " + eventId));
 
@@ -135,6 +137,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDto(comment);
     }
 
+    @Override
     public List<CommentDto> getAllForPublicUserByEventId(long eventId, int from, int size) {
         Page<Comment> comments = commentRepository.findAllByEventIdAndStatus(eventId, CommentStatus.PUBLISHED,
                 PageRequest.of(from, size));
@@ -143,6 +146,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDtos(comments.toList());
     }
 
+    @Override
     public void deleteForCommentatorByCommentatorIdAndCommentId(long commentatorId, long commentId) {
         checkCommentatorIdIsLinkedToCommentId(commentatorId, commentId);
 
@@ -150,7 +154,11 @@ public class CommentServiceImpl implements CommentService {
         log.info("⬛️ коментатором удален комментарий по id={}", commentId);
     }
 
-    public Comment checkCommentatorIdIsLinkedToCommentId(long commentatorId, long commentId) {
+    private Comment checkAndGetEntityById(long id) {
+        return commentRepository.findById(id).orElseThrow(() -> new MainExceptionIdNotFound("Comment with id=" + id + " was not found"));
+    }
+
+    private Comment checkCommentatorIdIsLinkedToCommentId(long commentatorId, long commentId) {
         Comment comment = commentRepository.findByIdAndCommentatorId(commentId, commentatorId);
 
         if (comment == null) {

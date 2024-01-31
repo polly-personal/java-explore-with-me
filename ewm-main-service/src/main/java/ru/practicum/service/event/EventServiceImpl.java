@@ -11,12 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatsClient;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.dto.event.*;
+import ru.practicum.entity.comment.CommentStatus;
 import ru.practicum.entity.event.Event;
 import ru.practicum.entity.event.EventState;
 import ru.practicum.entity.request.RequestStatus;
 import ru.practicum.exception.*;
+import ru.practicum.mapper.CommentMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.LocationMapper;
+import ru.practicum.repository.comment.CommentRepository;
+import ru.practicum.repository.comment.CountOfEventComments;
 import ru.practicum.repository.event.EventRepository;
 import ru.practicum.repository.request.ConfirmedRequestShortDto;
 import ru.practicum.repository.request.RequestsRepository;
@@ -36,8 +40,9 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserService userService;
     private final CategoryService categoryService;
-
     private final RequestsRepository requestsRepository;
+    private final CommentRepository commentRepository;
+
 
     private final StatsClient statsClient;
 
@@ -152,9 +157,11 @@ public class EventServiceImpl implements EventService {
             throw new MainExceptionImpossibleToPublicGetEntity("событие должно быть опубликовано");
 
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+
         eventFullDto.setConfirmedRequests(requestsRepository.countByEventIdAndStatus(id, RequestStatus.CONFIRMED));
         List<ViewStatsDto> viewStatsDtos = getViews(List.of(event));
         if (!viewStatsDtos.isEmpty()) eventFullDto.setViews(viewStatsDtos.get(0).getHits());
+        eventFullDto.setComments(CommentMapper.toCommentDtos(commentRepository.findAllByEventIdAndStatus(id, CommentStatus.PUBLISHED)));
 
         log.info("🟦 выдано событие={}", eventFullDto);
         return eventFullDto;
@@ -217,9 +224,8 @@ public class EventServiceImpl implements EventService {
 
         List<Event> events = eventRepository.getAllForPublicUsers(text, categoryIds, paid, rangeStart, rangeEnd);
 
-        List<ConfirmedRequestShortDto> requestRepoResult = requestsRepository.getCountConfirmedRequestsForAllEvents();
         Map<Long, Integer> countPublishedRequestsForAllEvents = new HashMap<>();
-        for (ConfirmedRequestShortDto counts : requestRepoResult) {
+        for (ConfirmedRequestShortDto counts : requestsRepository.getCountConfirmedRequestsForAllEvents()) {
             countPublishedRequestsForAllEvents.put(counts.getEventId(), counts.getCount());
         }
 
@@ -238,15 +244,22 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
 
-        List<EventShortDto> eventShortDtos = EventMapper.toEventShortDtos(events);
         Map<String, Integer> urlToHits = new HashMap<>();
         for (ViewStatsDto viewStatsDto : getViews(events)) {
             urlToHits.put(viewStatsDto.getUri(), viewStatsDto.getHits());
         }
 
+        Map<Long, Integer> countOfEventComments = new HashMap<>();
+        for (CountOfEventComments countOfEventComment : commentRepository.getCountPublishedCommentsForAllEvents()) {
+            countOfEventComments.put(countOfEventComment.getEventId(), countOfEventComment.getCount());
+        }
+
+        List<EventShortDto> eventShortDtos = EventMapper.toEventShortDtos(events);
         eventShortDtos.stream()
                 .map(eventShortDto -> {
-                    String currentUrl = "/events" + eventShortDto.getId();
+
+                    String currentUrl = "/events/" + eventShortDto.getId();
+
                     if (urlToHits.containsKey(currentUrl)) {
                         eventShortDto.setViews(urlToHits.get(currentUrl));
                     }
@@ -254,8 +267,13 @@ public class EventServiceImpl implements EventService {
                     if (countPublishedRequestsForAllEvents.containsKey(eventShortDto.getId())) {
                         eventShortDto.setConfirmedRequests(countPublishedRequestsForAllEvents.get(eventShortDto.getId()));
                     }
+
+                    if (countOfEventComments.containsKey(eventShortDto.getId())) {
+                        eventShortDto.setCountComments(countOfEventComments.get(eventShortDto.getId()));
+                    }
+
                     return eventShortDto;
-                });
+                }).collect(Collectors.toList());
 
         if (sort.equals("VIEWS")) {
             eventShortDtos.sort(Comparator.comparing(EventShortDto::getViews).reversed());

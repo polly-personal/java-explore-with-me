@@ -1,19 +1,18 @@
 package ru.practicum.service.comment;
 
 import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.RequestCommentDto;
-import ru.practicum.entity.comment.Comment;
+import ru.practicum.dto.comment.NewCommentDto;
+import ru.practicum.dto.comment.UpdateAdminCommentDto;
+import ru.practicum.dto.comment.UpdateUserCommentDto;
 
 import java.util.List;
 
 public interface CommentService {
-    CommentDto createForCommentatorByCommentatorIdAndEventId(long commentatorId, long eventId, RequestCommentDto requestCommentDto);
+    CommentDto createForCommentatorByCommentatorIdAndEventId(long commentatorId, NewCommentDto newCommentDto);
 
-    CommentDto updateForAdminByCommentId(long commentId, RequestCommentDto requestCommentDto);
+    CommentDto updateForAdminByCommentId(UpdateAdminCommentDto updateAdminCommentDto);
 
-    CommentDto updateForCommentatorByCommentatorIdAndCommentId(long commentatorId, long commentId, RequestCommentDto requestCommentDto);
-
-    Comment checkAndGetEntityById(long id);
+    CommentDto updateForCommentatorByCommentatorIdAndCommentId(long commentatorId, UpdateUserCommentDto updateUserCommentDto);
 
     CommentDto getForAdminByCommentId(long commentId);
 
@@ -24,6 +23,4 @@ public interface CommentService {
     List<CommentDto> getAllForPublicUserByEventId(long eventId, int from, int size);
 
     void deleteForCommentatorByCommentatorIdAndCommentId(long commentatorId, long commentId);
-
-    Comment checkCommentatorIdIsLinkedToCommentId(long commentatorId, long commentId);
 }

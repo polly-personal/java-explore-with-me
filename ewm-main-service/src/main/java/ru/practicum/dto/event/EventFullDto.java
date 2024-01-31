@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.dto.category.CategoryDto;
+import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.location.LocationDto;
 import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.entity.event.EventState;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static ru.practicum.constant.MainConstant.DATE_TIME_PATTERN;
 
@@ -48,4 +50,6 @@ public class EventFullDto {
     private String title;
 
     private int views;
+
+    private List<CommentDto> comments;
 }
